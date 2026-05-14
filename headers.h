@@ -72,6 +72,7 @@ class uinter{
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
+        bool checkms(int msx,int msy,int x,int y,int w,int h);
 };
 uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Renderer* renderer=sdl.getrender();
@@ -143,7 +144,16 @@ void uinter::handle(SDL_Event& event,int &mode){
             mode=-1;
         }
 
-
+//aint gon lie , miss u zeinb , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
+    }else if (event.type==SDL_MOUSEBUTTONDOWN){
+        if(event.button.button==SDL_BUTTON_LEFT){
+            int msx=event.button.x,msy=event.button.y;
+            if (checkms(msx,msy,350,165,100,70)){
+                vit+=1;
+            }else if(checkms(msx,msy,800,165,100,70)){
+                vit-=1;
+            }
+        }
     }
     
 }
@@ -180,7 +190,11 @@ void uinter::animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir){
         }
 
 }
-
-
+bool uinter::checkms(int msx,int msy,int x,int y,int w,int h){
+    if (msx<x+w && msx>x && msy<y+h && msy>y){
+        return true;
+    }
+    return false;
+}
 
 #endif 
