@@ -102,17 +102,19 @@ void uinter::draw(SDL_Texture* tex, int x,int y ,int w,int h){
 
 void uinter::layout(int* mode){
     if (*mode==0){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
+        int res=abs(vit%3);
+        std::cout<< vit;
+        sdl.drawtext(500,400,std::to_string(vit));
         
-        sdl.drawtext(500,400,"adding banks");
-        switch(vit){
+        switch(res){
             case 0:
                 draw(cbank,430,0,400,400);
                 break;
             case 1:
-                draw(mbank,500,200,150,150);
+                draw(mbank,430,0,400,400);
                 break;
             case 2:
-                draw(bbank,500,200,150,150);
+                draw(bbank,430,0,400,400);
                 break;
         }
         animate(ar,350,165,100,70,-1);
@@ -144,14 +146,14 @@ void uinter::handle(SDL_Event& event,int &mode){
             mode=-1;
         }
 
-//aint gon lie , miss u zeinb , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
+//aint gon lie , miss u , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
     }else if (event.type==SDL_MOUSEBUTTONDOWN){
         if(event.button.button==SDL_BUTTON_LEFT){
             int msx=event.button.x,msy=event.button.y;
             if (checkms(msx,msy,350,165,100,70)){
-                vit+=1;
-            }else if(checkms(msx,msy,800,165,100,70)){
                 vit-=1;
+            }else if(checkms(msx,msy,800,165,100,70)){
+                vit+=1;
             }
         }
     }
