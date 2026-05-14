@@ -103,18 +103,20 @@ void uinter::draw(SDL_Texture* tex, int x,int y ,int w,int h){
 void uinter::layout(int* mode){
     if (*mode==0){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
         int res=abs(vit%3);
-        std::cout<< vit;
         sdl.drawtext(500,400,std::to_string(vit));
         
         switch(res){
             case 0:
                 draw(cbank,430,0,400,400);
+                sdl.drawtext(580,450,"country bank");
                 break;
             case 1:
                 draw(mbank,430,0,400,400);
+                sdl.drawtext(580,450,"modern bank");
                 break;
             case 2:
                 draw(bbank,430,0,400,400);
+                sdl.drawtext(580,450,"billionaires bank");
                 break;
         }
         animate(ar,350,165,100,70,-1);
