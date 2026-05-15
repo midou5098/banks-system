@@ -94,9 +94,9 @@ class uinter{
     private:
         SDLinit& sdl;
         bank newb;
-        int current_frame=0,frame_delay=100,manag,focus=-1;
+        int current_frame=0,frame_delay=50,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat;
         int vit=0;
         std::string name,inter,s1,s2,s3,s4,mes;
 
@@ -116,6 +116,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* sc=IMG_Load("assets/cbank.png");
     SDL_Surface* ars=IMG_Load("assets/arrow.png");
     SDL_Surface* nbs=IMG_Load("assets/nbutton.png");
+    SDL_Surface* cats=IMG_Load("assets/cat.png");
 
 
     bbank=SDL_CreateTextureFromSurface(renderer,sb);
@@ -123,6 +124,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     cbank=SDL_CreateTextureFromSurface(renderer,sc);
     ar=SDL_CreateTextureFromSurface(renderer,ars);
     nbutton=SDL_CreateTextureFromSurface(renderer,nbs);
+    cat=SDL_CreateTextureFromSurface(renderer,cats);
     
     
     SDL_FreeSurface(sb);
@@ -130,6 +132,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_FreeSurface(sm);
     SDL_FreeSurface(ars);
     SDL_FreeSurface(nbs);
+    SDL_FreeSurface(cats);
     
 
 }
@@ -154,8 +157,8 @@ void uinter::layout(int* mode){
         sdl.drawtext(100,495,"clients :");
         if(!s4.empty()){sdl.drawtext(185,495,s4.c_str());}
         draw(nbutton,440,475,400,400);
-        if(!mes.empty()){sdl.drawtext(1000,600,mes.c_str());}
-
+        if(!mes.empty()){sdl.drawtext(1000,100,mes.c_str());}
+        animate(cat,1080,560,200,200,0);
 
         switch(res){
             case 0:
