@@ -42,7 +42,7 @@ class SDLinit{
         ~SDLinit();
         void clear();
         void present();
-        void drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text);
+        void drawbut(int x,int y,int w,int h,int r,int g,int b,const int type);
         void drawtext(int x,int y,const std::string &text);
         SDL_Renderer* getrender(void){return renderer;}
         void drawtextarea(int x,int y,int w,int h);
@@ -89,31 +89,16 @@ void SDLinit::drawtextarea(int x,int y,int w,int h){
     SDL_RenderDrawRect(renderer,&rect4);
     
 }
-void SDLinit::drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text){
-    
-    SDL_SetRenderDrawColor(renderer,r,g,b,255);
-    SDL_Rect rect6={x,y,w,h};
-    SDL_RenderFillRect(renderer,&rect6);
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderDrawRect(renderer,&rect6);
-    SDL_Color white = {120,120,120,255};
-    SDL_Surface* surf=TTF_RenderText_Solid(font1,text.c_str(),white);
-    SDL_Texture* tex=SDL_CreateTextureFromSurface(renderer,surf);
-    SDL_Rect rect5={x+27,y+10,w-50,h-30};
-    SDL_RenderCopy(renderer,tex,NULL,&rect5);
-    SDL_FreeSurface(surf);
-    SDL_DestroyTexture(tex);
-    
-}
+
 class uinter{
     private:
         SDLinit& sdl;
         bank newb;
         int current_frame=0,frame_delay=100,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton;
         int vit=0;
-        std::string name,inter,s1,s2,s3,s4;
+        std::string name,inter,s1,s2,s3,s4,mes;
 
     public:
         uinter(SDLinit& sdlo);
@@ -130,17 +115,21 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* sm=IMG_Load("assets/mbank.png");
     SDL_Surface* sc=IMG_Load("assets/cbank.png");
     SDL_Surface* ars=IMG_Load("assets/arrow.png");
+    SDL_Surface* nbs=IMG_Load("assets/nbutton.png");
+
 
     bbank=SDL_CreateTextureFromSurface(renderer,sb);
     mbank=SDL_CreateTextureFromSurface(renderer,sm);
     cbank=SDL_CreateTextureFromSurface(renderer,sc);
     ar=SDL_CreateTextureFromSurface(renderer,ars);
+    nbutton=SDL_CreateTextureFromSurface(renderer,nbs);
     
     
     SDL_FreeSurface(sb);
     SDL_FreeSurface(sc);
     SDL_FreeSurface(sm);
     SDL_FreeSurface(ars);
+    SDL_FreeSurface(nbs);
     
 
 }
@@ -164,7 +153,9 @@ void uinter::layout(int* mode){
         sdl.drawtextarea(180,490,100,30);
         sdl.drawtext(100,495,"clients :");
         if(!s4.empty()){sdl.drawtext(185,495,s4.c_str());}
-        sdl.drawbut()
+        draw(nbutton,440,475,400,400);
+        if(!mes.empty()){sdl.drawtext(1000,600,mes.c_str());}
+
 
         switch(res){
             case 0:
@@ -235,6 +226,12 @@ void uinter::handle(SDL_Event& event,int &mode){
                 focus=2;
             }else if (checkms(msx,msy,180,490,100,30)){
                 focus=3;
+            }else if (checkms(msx,msy,440,475,400,400)){
+                if (s1.empty() || s2.empty() || s3.empty() || s4.empty()){
+                    mes="nigga fill all the fields bruh";
+                }else{
+                    mode=-1;
+                }
             }else{
                 focus=-1;
             }
