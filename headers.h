@@ -10,6 +10,28 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
+
+class bank{
+    std::string name;
+    int inter;
+    int manager;
+    int clients;
+    int funds;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class SDLinit{
     private:
         SDL_Renderer* renderer;
@@ -20,11 +42,13 @@ class SDLinit{
         ~SDLinit();
         void clear();
         void present();
+        void drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text);
         void drawtext(int x,int y,const std::string &text);
-        void drawswitch(int x,int y,int dir);
         SDL_Renderer* getrender(void){return renderer;}
+        void drawtextarea(int x,int y,int w,int h);
 
 };
+
 SDLinit::SDLinit(int w,int h){
     SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO);
     TTF_Init();
@@ -39,7 +63,7 @@ SDLinit::~SDLinit(void){
     SDL_Quit();
 }
 void SDLinit::clear(void){
-    SDL_SetRenderDrawColor(renderer,140,210,60,255);
+    SDL_SetRenderDrawColor(renderer,246, 154, 44,255);
     SDL_RenderClear(renderer);
 }
 void SDLinit::present(void){
@@ -56,15 +80,40 @@ void SDLinit::drawtext(int x,int y,const std::string &text){
     SDL_FreeSurface(surf);
     SDL_DestroyTexture(tex);
 }
-
-
+void SDLinit::drawtextarea(int x,int y,int w,int h){
+    
+    SDL_Rect rect4={x,y,w,h};
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
+    SDL_RenderFillRect(renderer,&rect4);
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderDrawRect(renderer,&rect4);
+    
+}
+void SDLinit::drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text){
+    
+    SDL_SetRenderDrawColor(renderer,r,g,b,255);
+    SDL_Rect rect6={x,y,w,h};
+    SDL_RenderFillRect(renderer,&rect6);
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderDrawRect(renderer,&rect6);
+    SDL_Color white = {120,120,120,255};
+    SDL_Surface* surf=TTF_RenderText_Solid(font1,text.c_str(),white);
+    SDL_Texture* tex=SDL_CreateTextureFromSurface(renderer,surf);
+    SDL_Rect rect5={x+27,y+10,w-50,h-30};
+    SDL_RenderCopy(renderer,tex,NULL,&rect5);
+    SDL_FreeSurface(surf);
+    SDL_DestroyTexture(tex);
+    
+}
 class uinter{
     private:
         SDLinit& sdl;
-        int current_frame=0,frame_delay=100;
+        bank newb;
+        int current_frame=0,frame_delay=100,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar;
         int vit=0;
+        std::string name,inter,s1,s2,s3,s4;
 
     public:
         uinter(SDLinit& sdlo);
@@ -103,24 +152,37 @@ void uinter::draw(SDL_Texture* tex, int x,int y ,int w,int h){
 void uinter::layout(int* mode){
     if (*mode==0){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
         int res=abs(vit%3);
-        sdl.drawtext(500,400,std::to_string(vit));
-        
+        sdl.drawtextarea(180,340,300,30);
+        sdl.drawtext(100,345,"name :");
+        if(!s1.empty()){sdl.drawtext(185,345,s1.c_str());}
+        sdl.drawtextarea(180,390,100,30);
+        sdl.drawtext(30,395,"interest rate :");
+        if(!s2.empty()){sdl.drawtext(185,395,s2.c_str());}
+        sdl.drawtextarea(180,440,100,30);
+        sdl.drawtext(100,445,"funds :");
+        if(!s3.empty()){sdl.drawtext(185,445,s3.c_str());}
+        sdl.drawtextarea(180,490,100,30);
+        sdl.drawtext(100,495,"clients :");
+        if(!s4.empty()){sdl.drawtext(185,495,s4.c_str());}
+        sdl.drawbut()
+
         switch(res){
             case 0:
-                draw(cbank,430,0,400,400);
-                sdl.drawtext(580,450,"country bank");
+                draw(cbank,80,-60,400,400);
+                sdl.drawtext(215,270,"country bank");
                 break;
             case 1:
-                draw(mbank,430,0,400,400);
-                sdl.drawtext(580,450,"modern bank");
+                draw(mbank,80,-60,400,400);
+                sdl.drawtext(130,270,"modern bank");
                 break;
             case 2:
-                draw(bbank,430,0,400,400);
-                sdl.drawtext(580,450,"billionaires bank");
+                draw(bbank,80,-60,400,400);
+                sdl.drawtext(140,270,"billionaires bank");
                 break;
         }
-        animate(ar,350,165,100,70,-1);
-        animate(ar,800,165,100,70,1);
+        animate(ar,0,165,100,70,-1);
+        animate(ar,450,165,100,70,1);
+
 
 
 
@@ -147,15 +209,34 @@ void uinter::handle(SDL_Event& event,int &mode){
         }else if(key==SDLK_m){
             mode=-1;
         }
+        if(focus!=-1){
+            if (key>=32 && key<=126) {  
+                    char c=(char)key;
+                    if(focus==0 && s1.length()<20) s1+=c;
 
+                    else if(focus==1 && s2.length()<20) s2+=c;
+                    else if(focus==2 && s3.length()<10) s3+=c;
+                    else if(focus==3 && s3.length()<10) s4+=c;}
+                    
+        }
 //aint gon lie , miss u , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
     }else if (event.type==SDL_MOUSEBUTTONDOWN){
         if(event.button.button==SDL_BUTTON_LEFT){
             int msx=event.button.x,msy=event.button.y;
-            if (checkms(msx,msy,350,165,100,70)){
+            if (checkms(msx,msy,0,165,100,70)){
                 vit-=1;
-            }else if(checkms(msx,msy,800,165,100,70)){
+            }else if(checkms(msx,msy,450,165,100,70)){
                 vit+=1;
+            }else if (checkms(msx,msy,180,340,300,30)){
+                focus=0;
+            }else if (checkms(msx,msy,180,390,100,30)){
+                focus=1;                
+            }else if (checkms(msx,msy,180,440,100,30)){
+                focus=2;
+            }else if (checkms(msx,msy,180,490,100,30)){
+                focus=3;
+            }else{
+                focus=-1;
             }
         }
     }
