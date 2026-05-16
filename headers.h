@@ -236,16 +236,34 @@ void uinter::layout(int* mode){
         sdl.line(960,150,960,600);
         draw(jew,20,150,300,200);
         draw(kirk,340,150,300,200);
-        draw(adolf,680,150,300,200);
-        draw(somal,1000,150,300,200);
-        
+        draw(adolf,660,150,300,200);
+        draw(somal,990,150,300,200);
+        sdl.drawtext(100,370,"name : shlomo");
+        sdl.drawtext(95,420,"origin :   obvious...");
+        sdl.drawtext(75,470,"pros :  +bank relations");
+        sdl.drawtext(95,520,"cons :  -reputaion");
+
+        sdl.drawtext(420,370,"name : kirk");
+        sdl.drawtext(400,420,"origin :   america");
+        sdl.drawtext(420,470,"pros :  +funds");
+        sdl.drawtext(415,520,"cons :  -clients");
+
+        sdl.drawtext(740,370,"name : adolf");
+        sdl.drawtext(720,420,"origin :  germany");
+        sdl.drawtext(730,470,"pros :  +reputaion");
+        sdl.drawtext(705,520,"cons :  -banks relations");
+
+        sdl.drawtext(1060,370,"name : captain");
+        sdl.drawtext(1060,420,"origin :  somal");
+        sdl.drawtext(1056,470,"pros :  +security");
+        sdl.drawtext(1045,520,"cons :  -reputation");
         int xs;
         switch(manag){
             case 1 :
-                xs=160-50;
+                xs=150;
                 break;
             case 2:
-                xs=480-50;
+                xs=450;
                 break;
             case 3:
                 xs=840-50;
