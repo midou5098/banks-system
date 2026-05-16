@@ -14,11 +14,12 @@
 #include <vector>
 #include <math.h>
 class bank{
-    std::string name;
-    int inter;
-    int manager;
-    int clients;
-    int funds;
+    public:
+        std::string name;
+        int inter;
+        int manager;
+        int clients;
+        int funds;
 };
 
 
@@ -95,12 +96,12 @@ std::vector<SDL_Texture*> tips;
 class uinter{
     private:
         SDLinit& sdl;
-        bank newb;
         int current_frame=0,frame_delay=75,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
+        bank newb;
 
     public:
         uinter(SDLinit& sdlo);
@@ -129,7 +130,8 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
         SDL_Surface* surface = IMG_Load(s.str().c_str());
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
         tips.push_back(texture);
-        SDL_FreeSurface(surface);}
+        SDL_FreeSurface(surface);
+    }
 
 
 
@@ -257,6 +259,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                     mes="nigga fill all the fields bruh";
                 }else{
                     mode=-1;
+                    newb.clients=std::stoi(s4.c_str());
+                    newb.inter=std::stoi(s2.c_str());
+                    newb.funds=std::stoi(s3.c_str());
+                    newb.name=s1;
                 }
             }else{
                 focus=-1;
