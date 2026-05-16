@@ -100,9 +100,9 @@ std::vector<SDL_Texture*> tips;
 class uinter{
     private:
         SDLinit& sdl;
-        int current_frame=0,frame_delay=75,manag,focus=-1;
+        int current_frame=0,frame_delay=75,manag=0,focus=-1;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
         bank newb;
@@ -131,6 +131,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* ads=IMG_Load("assets/adolf.png");
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
+    SDL_Surface* stars=IMG_Load("assets/star.png");
 
     for (int i = 1; i <= 5; i++) {
         std::ostringstream s ;
@@ -159,6 +160,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     adolf=SDL_CreateTextureFromSurface(renderer,ads);
     somal=SDL_CreateTextureFromSurface(renderer,soms);
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
+    star=SDL_CreateTextureFromSurface(renderer,stars);
     
     
     SDL_FreeSurface(sb);
@@ -171,6 +173,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_FreeSurface(jews);
     SDL_FreeSurface(soms);
     SDL_FreeSurface(kirks);
+    SDL_FreeSurface(stars);
     
 
 }
@@ -235,6 +238,25 @@ void uinter::layout(int* mode){
         draw(kirk,340,150,300,200);
         draw(adolf,680,150,300,200);
         draw(somal,1000,150,300,200);
+        
+        int xs;
+        switch(manag){
+            case 1 :
+                xs=160-50;
+                break;
+            case 2:
+                xs=480-50;
+                break;
+            case 3:
+                xs=840-50;
+                break;
+            case 4:
+                xs=1160-50;
+                break;
+        }
+        if(manag!=0){
+            animate(star,xs,560,60,60,-1);
+        }
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
@@ -268,31 +290,45 @@ void uinter::handle(SDL_Event& event,int &mode){
     }else if (event.type==SDL_MOUSEBUTTONDOWN){
         if(event.button.button==SDL_BUTTON_LEFT){
             int msx=event.button.x,msy=event.button.y;
-            if (checkms(msx,msy,0,165,100,70)){
-                vit-=1;
-            }else if(checkms(msx,msy,450,165,100,70)){
-                vit+=1;
-            }else if (checkms(msx,msy,180,340,300,30)){
-                focus=0;
-            }else if (checkms(msx,msy,180,390,100,30)){
-                focus=1;                
-            }else if (checkms(msx,msy,180,440,100,30)){
-                focus=2;
-            }else if (checkms(msx,msy,180,490,100,30)){
-                focus=3;
-            }else if (checkms(msx,msy,440,475,400,400)){
-                if (s1.empty() || s2.empty() || s3.empty() || s4.empty()){
-                    mes="nigga fill all the fields bruh";
-                }else{
-                    mode=11;
-                    newb.clients=std::stoi(s4.c_str());
-                    newb.inter=std::stoi(s2.c_str());
-                    newb.funds=std::stoi(s3.c_str());
-                    newb.name=s1;
-                }
-            }else{
-                focus=-1;
+            switch(mode){
+                case 1:
+                    if (checkms(msx,msy,0,165,100,70)){
+                        vit-=1;
+                    }else if(checkms(msx,msy,450,165,100,70)){
+                        vit+=1;
+                    }else if (checkms(msx,msy,180,340,300,30)){
+                        focus=0;
+                    }else if (checkms(msx,msy,180,390,100,30)){
+                        focus=1;                
+                    }else if (checkms(msx,msy,180,440,100,30)){
+                        focus=2;
+                    }else if (checkms(msx,msy,180,490,100,30)){
+                        focus=3;
+                    }else if (checkms(msx,msy,440,475,400,400)){
+                        if (s1.empty() || s2.empty() || s3.empty() || s4.empty()){
+                            mes="nigga fill all the fields bruh";
+                        }else{
+                            mode=11;
+                            newb.clients=std::stoi(s4.c_str());
+                            newb.inter=std::stoi(s2.c_str());
+                            newb.funds=std::stoi(s3.c_str());
+                            newb.name=s1;
+                        }
+                    }else{
+                        focus=-1;
+                    }break;
+                case 11:
+                    if(checkms(msx,msy,0,150,320,450)){
+                        manag=1;
+                    }else if(checkms(msx,msy,320,150,320,450)){
+                        manag=2;
+                    }else if(checkms(msx,msy,640,150,320,450)){
+                        manag=3;
+                    }else if(checkms(msx,msy,960,150,320,450)){
+                        manag=4;
+                    }
             }
+        
         }
     }
     
