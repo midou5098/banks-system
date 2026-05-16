@@ -9,8 +9,10 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
-
-
+#include <sstream>
+#include <string>
+#include <vector>
+#include <math.h>
 class bank{
     std::string name;
     int inter;
@@ -63,7 +65,7 @@ SDLinit::~SDLinit(void){
     SDL_Quit();
 }
 void SDLinit::clear(void){
-    SDL_SetRenderDrawColor(renderer,246, 154, 44,255);
+    SDL_SetRenderDrawColor(renderer,128, 54, 7,255);
     SDL_RenderClear(renderer);
 }
 void SDLinit::present(void){
@@ -89,15 +91,15 @@ void SDLinit::drawtextarea(int x,int y,int w,int h){
     SDL_RenderDrawRect(renderer,&rect4);
     
 }
-
+std::vector<SDL_Texture*> tips;
 class uinter{
     private:
         SDLinit& sdl;
         bank newb;
-        int current_frame=0,frame_delay=50,manag,focus=-1;
+        int current_frame=0,frame_delay=75,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat;
-        int vit=0;
+        int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
 
     public:
@@ -107,8 +109,11 @@ class uinter{
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
         bool checkms(int msx,int msy,int x,int y,int w,int h);
+        void shuffle(void){j=rand()%5;};
 };
 uinter::uinter(SDLinit& sdlo):sdl(sdlo){
+    shuffle();
+
     SDL_Renderer* renderer=sdl.getrender();
 
     SDL_Surface* sb=IMG_Load("assets/bbank.png");
@@ -117,6 +122,21 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* ars=IMG_Load("assets/arrow.png");
     SDL_Surface* nbs=IMG_Load("assets/nbutton.png");
     SDL_Surface* cats=IMG_Load("assets/cat.png");
+
+    for (int i = 1; i <= 5; i++) {
+        std::ostringstream s ;
+        s <<"assets/tip"<< i  << ".png";
+        SDL_Surface* surface = IMG_Load(s.str().c_str());
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+        tips.push_back(texture);
+        SDL_FreeSurface(surface);}
+
+
+
+
+
+
+
 
 
     bbank=SDL_CreateTextureFromSurface(renderer,sb);
@@ -159,7 +179,7 @@ void uinter::layout(int* mode){
         draw(nbutton,440,475,400,400);
         if(!mes.empty()){sdl.drawtext(1000,100,mes.c_str());}
         animate(cat,1080,560,200,200,0);
-
+        draw(tips[j],600,0,700,500);
         switch(res){
             case 0:
                 draw(cbank,80,-60,400,400);
@@ -198,10 +218,13 @@ void uinter::handle(SDL_Event& event,int &mode){
         SDL_Keycode key=event.key.keysym.sym;
         if (key==SDLK_a){
             mode=0;
+            shuffle();
         }else if(key==SDLK_v){
             mode=1;
+            shuffle();
         }else if(key==SDLK_m){
             mode=-1;
+            shuffle();
         }
         if(focus!=-1){
             if (key>=32 && key<=126) {  
