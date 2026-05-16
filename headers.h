@@ -45,13 +45,17 @@ class SDLinit{
         ~SDLinit();
         void clear();
         void present();
+        void line(int x1,int y1,int x2,int y2);
         void drawbut(int x,int y,int w,int h,int r,int g,int b,const int type);
         void drawtext(int x,int y,const std::string &text);
         SDL_Renderer* getrender(void){return renderer;}
         void drawtextarea(int x,int y,int w,int h);
 
 };
+void SDLinit::line(int x1,int y1,int x2,int y2){
 
+    SDL_RenderDrawLine(renderer,x1,y1,x2,y2);
+}
 SDLinit::SDLinit(int w,int h){
     SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO);
     TTF_Init();
@@ -98,7 +102,7 @@ class uinter{
         SDLinit& sdl;
         int current_frame=0,frame_delay=75,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
         bank newb;
@@ -126,6 +130,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* jews=IMG_Load("assets/jew.png");
     SDL_Surface* ads=IMG_Load("assets/adolf.png");
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
+    SDL_Surface* kirks=IMG_Load("assets/kirk.png");
 
     for (int i = 1; i <= 5; i++) {
         std::ostringstream s ;
@@ -153,6 +158,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     jew=SDL_CreateTextureFromSurface(renderer,jews);
     adolf=SDL_CreateTextureFromSurface(renderer,ads);
     somal=SDL_CreateTextureFromSurface(renderer,soms);
+    kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     
     
     SDL_FreeSurface(sb);
@@ -164,6 +170,7 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_FreeSurface(ads);
     SDL_FreeSurface(jews);
     SDL_FreeSurface(soms);
+    SDL_FreeSurface(kirks);
     
 
 }
@@ -219,7 +226,15 @@ void uinter::layout(int* mode){
 
 
     }else if (*mode==11){
-        sdl.drawtext(600,100,"choose the manager :");
+        sdl.drawtext(530,100,"choose the manager :");
+        SDL_SetRenderDrawColor(sdl.getrender(),0,0,0,255);
+        sdl.line(320,150,320,600);
+        sdl.line(640,150,640,600);
+        sdl.line(960,150,960,600);
+        draw(jew,20,150,300,200);
+        draw(kirk,340,150,300,200);
+        draw(adolf,680,150,300,200);
+        draw(somal,1000,150,300,200);
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
