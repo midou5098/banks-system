@@ -5,7 +5,7 @@
 
 
 int main(void){
-    int mode=0;
+    int mode=1;
     SDLinit sdl(1280,720);
     uinter uic(sdl);
     bool running =true;

@@ -98,7 +98,7 @@ class uinter{
         SDLinit& sdl;
         int current_frame=0,frame_delay=75,manag,focus=-1;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
         bank newb;
@@ -123,6 +123,9 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_Surface* ars=IMG_Load("assets/arrow.png");
     SDL_Surface* nbs=IMG_Load("assets/nbutton.png");
     SDL_Surface* cats=IMG_Load("assets/cat.png");
+    SDL_Surface* jews=IMG_Load("assets/jew.png");
+    SDL_Surface* ads=IMG_Load("assets/adolf.png");
+    SDL_Surface* soms=IMG_Load("assets/somalian.png");
 
     for (int i = 1; i <= 5; i++) {
         std::ostringstream s ;
@@ -147,6 +150,9 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     ar=SDL_CreateTextureFromSurface(renderer,ars);
     nbutton=SDL_CreateTextureFromSurface(renderer,nbs);
     cat=SDL_CreateTextureFromSurface(renderer,cats);
+    jew=SDL_CreateTextureFromSurface(renderer,jews);
+    adolf=SDL_CreateTextureFromSurface(renderer,ads);
+    somal=SDL_CreateTextureFromSurface(renderer,soms);
     
     
     SDL_FreeSurface(sb);
@@ -155,6 +161,9 @@ uinter::uinter(SDLinit& sdlo):sdl(sdlo){
     SDL_FreeSurface(ars);
     SDL_FreeSurface(nbs);
     SDL_FreeSurface(cats);
+    SDL_FreeSurface(ads);
+    SDL_FreeSurface(jews);
+    SDL_FreeSurface(soms);
     
 
 }
@@ -164,7 +173,7 @@ void uinter::draw(SDL_Texture* tex, int x,int y ,int w,int h){
 }
 
 void uinter::layout(int* mode){
-    if (*mode==0){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
+    if (*mode==1){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
         int res=abs(vit%3);
         sdl.drawtextarea(180,340,300,30);
         sdl.drawtext(100,345,"name :");
@@ -209,7 +218,9 @@ void uinter::layout(int* mode){
 
 
 
-    }else if (*mode==1){
+    }else if (*mode==11){
+        sdl.drawtext(600,100,"choose the manager :");
+    }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
         sdl.drawtext(500,300,"viewing map");
@@ -219,10 +230,10 @@ void uinter::handle(SDL_Event& event,int &mode){
     if (event.type==SDL_KEYDOWN){
         SDL_Keycode key=event.key.keysym.sym;
         if (key==SDLK_a){
-            mode=0;
+            mode=1;
             shuffle();
         }else if(key==SDLK_v){
-            mode=1;
+            mode=2;
             shuffle();
         }else if(key==SDLK_m){
             mode=-1;
@@ -258,7 +269,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                 if (s1.empty() || s2.empty() || s3.empty() || s4.empty()){
                     mes="nigga fill all the fields bruh";
                 }else{
-                    mode=-1;
+                    mode=11;
                     newb.clients=std::stoi(s4.c_str());
                     newb.inter=std::stoi(s2.c_str());
                     newb.funds=std::stoi(s3.c_str());
