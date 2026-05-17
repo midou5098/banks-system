@@ -146,7 +146,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=0,focus=-1,res;
+        int current_frame=0,frame_delay=75,manag=0,focus=-1,res,nx,ny;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*maptl,*mapml,*mapbl,*maptm,*mapmm,*mapbm,*maptr,*mapmr,*mapbr;
         int vit=0,j;
@@ -158,12 +158,28 @@ class uinter{
         void layout(int* mode);
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
+        void viewport(int x,int y);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         
         void shuffle(void){j=rand()%5;};
         uinter(SDLinit& sdlo,database& dbo);
     };
+
+void rendercol(int col ,int x){
+    switch(col){
+        case 1:
+            
+    }
+}
+void renderow(int col,int x){
+
+}
+void uinter::viewport(int x,int y){
+    int row=x/426;
+    int col=x=y/426;
+    
+}
 uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     
     shuffle();
@@ -182,15 +198,15 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
     SDL_Surface* stars=IMG_Load("assets/star.png");
 
-    SDL_Surface* maps1=IMG_Load("assets/maps/maptl.png");
-    SDL_Surface* maps2=IMG_Load("assets/maps/mapml.png");
-    SDL_Surface* maps3=IMG_Load("assets/maps/mapbl.png");
-    SDL_Surface* maps4=IMG_Load("assets/maps/mapmm.png");
-    SDL_Surface* maps5=IMG_Load("assets/maps/maptm.png");
-    SDL_Surface* maps6=IMG_Load("assets/maps/mapbm.png");
-    SDL_Surface* maps7=IMG_Load("assets/maps/maprt.png");
-    SDL_Surface* maps8=IMG_Load("assets/maps/maprm.png");
-    SDL_Surface* maps9=IMG_Load("assets/maps/maprb.png");
+    SDL_Surface* maps1=IMG_Load("assets/map/maptl.png");
+    SDL_Surface* maps2=IMG_Load("assets/map/mapml.png");
+    SDL_Surface* maps3=IMG_Load("assets/map/mapbl.png");
+    SDL_Surface* maps4=IMG_Load("assets/map/mapmm.png");
+    SDL_Surface* maps5=IMG_Load("assets/map/maptm.png");
+    SDL_Surface* maps6=IMG_Load("assets/map/mapbm.png");
+    SDL_Surface* maps7=IMG_Load("assets/map/maprt.png");
+    SDL_Surface* maps8=IMG_Load("assets/map/maprm.png");
+    SDL_Surface* maps9=IMG_Load("assets/map/maprb.png");
 
 
 
@@ -370,16 +386,11 @@ void uinter::layout(int* mode){
         
         SDL_RenderCopy(sdl.getrender(),maptm,NULL,&rmaptm);
         SDL_RenderCopy(sdl.getrender(),mapmm,NULL,&rmapmm);
-        SDL_RenderCopy(sdl.getrender(),mapbm,NULL,&rmapmm);
+        SDL_RenderCopy(sdl.getrender(),mapbm,NULL,&rmapbm);
 
         SDL_RenderCopy(sdl.getrender(),maptr,NULL,&rmaptr);
         SDL_RenderCopy(sdl.getrender(),mapmr,NULL,&rmapmr);
-        SDL_RenderCopy(sdl.getrender(),mapbr,NULL,&rmapbm);
-    
-    
-    
-    
-    
+        SDL_RenderCopy(sdl.getrender(),mapbr,NULL,&rmapbr);
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
