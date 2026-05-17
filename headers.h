@@ -1,3 +1,4 @@
+#include <SDL2/SDL_keycode.h>
 #ifndef HEADERS_H
 #include <sqlite3.h>
 #include <SDL2/SDL_render.h>
@@ -148,9 +149,11 @@ class uinter{
         database& db;
         int current_frame=0,frame_delay=75,manag=0,focus=-1,res,nx,ny;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*maptl,*mapml,*mapbl,*maptm,*mapmm,*mapbm,*maptr,*mapmr,*mapbr;
-        int vit=0,j;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33;
+        int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0;
         std::string name,inter,s1,s2,s3,s4,mes;
+        SDL_Texture* mapst[9];
+        SDL_Rect rect[9];
         bank newb;
 
     public:
@@ -158,7 +161,8 @@ class uinter{
         void layout(int* mode);
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
-        void viewport(int x,int y);
+        void renderit(int x,int y,int cased);
+        void viewport(void);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         
@@ -166,22 +170,15 @@ class uinter{
         uinter(SDLinit& sdlo,database& dbo);
     };
 
-void rendercol(int col ,int x){
-    switch(col){
-        case 1:
-            
-    }
-}
-void renderow(int col,int x){
 
-}
-void uinter::viewport(int x,int y){
-    int row=x/426;
-    int col=x=y/426;
-    
+
+void uinter::viewport(void){
+    for(int i=0;i<9;i++){
+        SDL_RenderCopy(sdl.getrender(),mapst[i],NULL,&rect[i]);
+    }
+ 
 }
 uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
-    
     shuffle();
 
     SDL_Renderer* renderer=sdl.getrender();
@@ -241,15 +238,15 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     star=SDL_CreateTextureFromSurface(renderer,stars);
     
-    maptl=SDL_CreateTextureFromSurface(renderer,maps1);
-    mapml=SDL_CreateTextureFromSurface(renderer,maps2);
-    mapbl=SDL_CreateTextureFromSurface(renderer,maps3);
-    maptm=SDL_CreateTextureFromSurface(renderer,maps4);
-    mapmm=SDL_CreateTextureFromSurface(renderer,maps5);
-    mapbm=SDL_CreateTextureFromSurface(renderer,maps6);
-    maptr=SDL_CreateTextureFromSurface(renderer,maps7);
-    mapmr=SDL_CreateTextureFromSurface(renderer,maps8);
-    mapbr=SDL_CreateTextureFromSurface(renderer,maps9);
+    mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
+    mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
+    mapst[2]=SDL_CreateTextureFromSurface(renderer,maps3);
+    mapst[3]=SDL_CreateTextureFromSurface(renderer,maps4);
+    mapst[4]=SDL_CreateTextureFromSurface(renderer,maps5);
+    mapst[5]=SDL_CreateTextureFromSurface(renderer,maps6);
+    mapst[6]=SDL_CreateTextureFromSurface(renderer,maps7);
+    mapst[7]=SDL_CreateTextureFromSurface(renderer,maps8);
+    mapst[8]=SDL_CreateTextureFromSurface(renderer,maps9);
     
     
     
@@ -367,30 +364,21 @@ void uinter::layout(int* mode){
             animate(star,xs,560,60,60,-1);
         }
     }else if (*mode==12){
-        SDL_Rect rmaptl={-1280,-720,1280,720};
-        SDL_Rect rmapml={-1280,0,1280,720};
-        SDL_Rect rmapbl={-1280,720,1280,720};
+        rect[0]={worldx,worldy,1280,720};
+        rect[1]={worldx,worldy+720,1280,720};
+        rect[2]={worldx,worldy+1440,1280,720};
 
-        SDL_Rect rmaptm={0,-720,1280,720};
-        SDL_Rect rmapmm={0,0,1280,720};
-        SDL_Rect rmapbm={0,720,1280,720};
+        rect[3]={worldx+1280,worldy,1280,720};
+        rect[4]={worldx+1280,worldy+720,1280,720};
+        rect[5]={worldx+1280,worldy+1440,1280,720};
 
-        SDL_Rect rmaptr={1280,-720,1280,720};
-        SDL_Rect rmapmr={1280,0,1280,720};
-        SDL_Rect rmapbr={1280,720,1280,720};
+        rect[6]={worldx+2480,worldy,1280,720};
+        rect[7]={worldx+2480,worldy+720,1280,720};
+        rect[8]={worldx+2480,worldy+1440,1280,720};
+        viewport();
         
 
-        SDL_RenderCopy(sdl.getrender(),maptl,NULL,&rmaptl);
-        SDL_RenderCopy(sdl.getrender(),mapml,NULL,&rmapml);
-        SDL_RenderCopy(sdl.getrender(),mapbl,NULL,&rmapbl);
         
-        SDL_RenderCopy(sdl.getrender(),maptm,NULL,&rmaptm);
-        SDL_RenderCopy(sdl.getrender(),mapmm,NULL,&rmapmm);
-        SDL_RenderCopy(sdl.getrender(),mapbm,NULL,&rmapbm);
-
-        SDL_RenderCopy(sdl.getrender(),maptr,NULL,&rmaptr);
-        SDL_RenderCopy(sdl.getrender(),mapmr,NULL,&rmapmr);
-        SDL_RenderCopy(sdl.getrender(),mapbr,NULL,&rmapbr);
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
@@ -400,25 +388,33 @@ void uinter::layout(int* mode){
 void uinter::handle(SDL_Event& event,int &mode){
     if (event.type==SDL_KEYDOWN){
         SDL_Keycode key=event.key.keysym.sym;
-        if (key==SDLK_a){
-            mode=1;
-            shuffle();
-        }else if(key==SDLK_v){
-            mode=2;
-            shuffle();
-        }else if(key==SDLK_m){
-            mode=-1;
-            shuffle();
-        }
-        if(focus!=-1){
-            if (key>=32 && key<=126) {  
-                    char c=(char)key;
-                    if(focus==0 && s1.length()<20) s1+=c;
+        switch(mode){
+            case 1:
+                if (key==SDLK_a){
+                mode=1;
+                shuffle();
+                }else if(key==SDLK_v){
+                    mode=2;
+                    shuffle();
+                }else if(key==SDLK_m){
+                    mode=-1;
+                    shuffle();
+                }
+                if(focus!=-1){
+                    if (key>=32 && key<=126) {  
+                            char c=(char)key;
+                            if(focus==0 && s1.length()<20) s1+=c;
 
-                    else if(focus==1 && s2.length()<20) s2+=c;
-                    else if(focus==2 && s3.length()<10) s3+=c;
-                    else if(focus==3 && s3.length()<10) s4+=c;}
-                    
+                            else if(focus==1 && s2.length()<20) s2+=c;
+                            else if(focus==2 && s3.length()<10) s3+=c;
+                            else if(focus==3 && s3.length()<10) s4+=c;}
+                            
+                }
+            case 12:
+                if(key==SDLK_RIGHT){
+                    worldx+=50;
+                }
+
         }
 //aint gon lie , miss u , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
     }else if (event.type==SDL_MOUSEBUTTONDOWN){
