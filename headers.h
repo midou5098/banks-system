@@ -413,20 +413,20 @@ void uinter::handle(SDL_Event& event,int &mode){
                 break;
             case 12:
                 if(key==SDLK_RIGHT){
-                    if ( worldx-40>=-1280){
+                    if ( worldx-40>=-2480){
                         worldx-=40;
                     }
                 }else if(key==SDLK_LEFT){
-                    if (worldx+40<=3840 && worldx+40>=-1280){
+                    if (worldx+40<=0){
                         worldx+=40;
                     }
                 }else if(key==SDLK_UP){
-                    if (worldy-40<=1440 && worldy-40>-720){
-                        worldy-=40;
+                    if (worldy+40<=0){
+                        worldy+=40;
                     }
                 }else if(key==SDLK_DOWN){
-                    if (worldy+40<3840 && worldy+40>-720){
-                        worldy+=40;
+                    if (worldy-40>=-1440){
+                        worldy-=40;
                     }
                 }
                 break;
