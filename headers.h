@@ -148,7 +148,7 @@ class uinter{
         database& db;
         int current_frame=0,frame_delay=75,manag=0,focus=-1,res;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*maptl,*mapml,*mapbl,*maptm,*mapmm,*mapbm,*maptr,*mapmr,*mapbr;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
         bank newb;
@@ -181,7 +181,20 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
     SDL_Surface* stars=IMG_Load("assets/star.png");
-    SDL_Surface* maps=IMG_Load("assets/map.png");
+
+    SDL_Surface* maps1=IMG_Load("assets/maps/maptl.png");
+    SDL_Surface* maps2=IMG_Load("assets/maps/mapml.png");
+    SDL_Surface* maps3=IMG_Load("assets/maps/mapbl.png");
+    SDL_Surface* maps4=IMG_Load("assets/maps/mapmm.png");
+    SDL_Surface* maps5=IMG_Load("assets/maps/maptm.png");
+    SDL_Surface* maps6=IMG_Load("assets/maps/mapbm.png");
+    SDL_Surface* maps7=IMG_Load("assets/maps/maprt.png");
+    SDL_Surface* maps8=IMG_Load("assets/maps/maprm.png");
+    SDL_Surface* maps9=IMG_Load("assets/maps/maprb.png");
+
+
+
+
 
     for (int i = 1; i <= 5; i++) {
         std::ostringstream s ;
@@ -211,7 +224,17 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     somal=SDL_CreateTextureFromSurface(renderer,soms);
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     star=SDL_CreateTextureFromSurface(renderer,stars);
-    map=SDL_CreateTextureFromSurface(renderer,maps);
+    
+    maptl=SDL_CreateTextureFromSurface(renderer,maps1);
+    mapml=SDL_CreateTextureFromSurface(renderer,maps2);
+    mapbl=SDL_CreateTextureFromSurface(renderer,maps3);
+    maptm=SDL_CreateTextureFromSurface(renderer,maps4);
+    mapmm=SDL_CreateTextureFromSurface(renderer,maps5);
+    mapbm=SDL_CreateTextureFromSurface(renderer,maps6);
+    maptr=SDL_CreateTextureFromSurface(renderer,maps7);
+    mapmr=SDL_CreateTextureFromSurface(renderer,maps8);
+    mapbr=SDL_CreateTextureFromSurface(renderer,maps9);
+    
     
     
     SDL_FreeSurface(sb);
@@ -225,7 +248,6 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(soms);
     SDL_FreeSurface(kirks);
     SDL_FreeSurface(stars);
-    SDL_FreeSurface(maps);
     
 
 }
@@ -329,30 +351,30 @@ void uinter::layout(int* mode){
             animate(star,xs,560,60,60,-1);
         }
     }else if (*mode==12){
-        SDL_Rect maptl={0,0,1280,720};
-        SDL_Rect mapml={-1280,-720,1280,720};
-        SDL_Rect mapbl={-1280,0,1280,720};
+        SDL_Rect rmaptl={0,0,1280,720};
+        SDL_Rect rmapml={-1280,-720,1280,720};
+        SDL_Rect rmapbl={-1280,0,1280,720};
 
-        SDL_Rect maptm={0,-720,1280,720};
-        SDL_Rect mapmm={0,0,1280,720};
-        SDL_Rect mapbm={0,720,1280,720};
+        SDL_Rect rmaptm={0,-720,1280,720};
+        SDL_Rect rmapmm={0,0,1280,720};
+        SDL_Rect rmapbm={0,720,1280,720};
 
-        SDL_Rect maptr={0,0,1280,720};
-        SDL_Rect mapmr={-1280,-720,1280,720};
-        SDL_Rect mapbr={-1280,0,1280,720};
+        SDL_Rect rmaptr={0,0,1280,720};
+        SDL_Rect rmapmr={-1280,-720,1280,720};
+        SDL_Rect rmapbr={-1280,0,1280,720};
         
 
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptl);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapml);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapbl);
+        SDL_RenderCopy(sdl.getrender(),maptl,NULL,&rmaptl);
+        SDL_RenderCopy(sdl.getrender(),mapml,NULL,&rmapml);
+        SDL_RenderCopy(sdl.getrender(),mapbl,NULL,&rmapbl);
         
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptm);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmm);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmm);
+        SDL_RenderCopy(sdl.getrender(),maptm,NULL,&rmaptm);
+        SDL_RenderCopy(sdl.getrender(),mapmm,NULL,&rmapmm);
+        SDL_RenderCopy(sdl.getrender(),mapbm,NULL,&rmapmm);
 
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptr);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmr);
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapbm);
+        SDL_RenderCopy(sdl.getrender(),maptr,NULL,&rmaptr);
+        SDL_RenderCopy(sdl.getrender(),mapmr,NULL,&rmapmr);
+        SDL_RenderCopy(sdl.getrender(),mapbr,NULL,&rmapbm);
     
     
     
