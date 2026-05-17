@@ -46,140 +46,6 @@ class database{
     int modify(bank nb);
     int add(bank nb);
 };
-int database::opening(int choice){
-    if(choice==0){
-        sqlite3_open("books.sqlite",&db);
-        const char* createBooksTable = 
-        "CREATE TABLE IF NOT EXISTS books ("
-        "name TEXT PRIMARY KEY AUTOINCREMENT,"
-        "interest INTEGER NOT NULL,"
-        "funds INTEGER NOT NULL,"
-        "clients INTEGER,"
-        "x INTEGER,"
-        "y INTEGER,"
-        ");";
-        if(sqlite3_exec(db, createBooksTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;
-
-        const char* createauthorsTable = 
-        "CREATE TABLE IF NOT EXISTS authors ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "name TEXT NOT NULL,"
-        "age INTEGER,"
-        "skin TEXT NOT NULL,"
-        "books INTEGER"
-        ");";
-        if(sqlite3_exec(db, createauthorsTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;    
-
-        const char* createstaffTable = 
-        "CREATE TABLE IF NOT EXISTS staff ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "name TEXT NOT NULL,"
-        "age INTEGER,"
-        "salary INTEGER,"
-        "pos INTEGER"
-        ");";
-        if(sqlite3_exec(db, createstaffTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;
-        return 0;
-    }else if (choice==1){
-        char* filename = tinyfd_openFileDialog(
-            "Select Database File",
-            "",
-            0,
-            NULL,
-            "SQLite Files (*.sqlite;*.db)",
-            0
-        );
-        if (filename==NULL) return 2;
-        std::string fname(filename);
-        if(fname.size()<7 || fname.substr(fname.size()-7)!=".sqlite"){
-            return 1;
-        }
-        if(sqlite3_open(filename,&db)!=SQLITE_OK) return 1; 
-        int res = sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", nullptr, nullptr, nullptr);
-        if (res!=SQLITE_OK){
-            sqlite3_close(db);
-            db = nullptr;
-            return 1;
-        }
-        return 0;
-    }
-    return 0;
-};
-bool database::remove(bank nb) {
-    sqlite3_stmt* stmt;
-    const char* sql;
-    switch(mod) {
-        case 1: 
-            sql = "DELETE FROM books WHERE id = ?";   break;
-        case 2: 
-            sql = "DELETE FROM authors WHERE id = ?"; break;
-        case 3: 
-            sql = "DELETE FROM staff WHERE id = ?";   break;
-        default: return false;
-    }
-    if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
-    sqlite3_bind_int(stmt, 1, id);
-    sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-    return sqlite3_changes(db) > 0;
-}  
-
-bool database::search(int table,int id ,book& booki,author& authori,staff& staffi){
-    sqlite3_stmt* stmt;
-    const char* sql;
-    switch(table){
-        case 1:
-            
-            
-            sql = "SELECT id, name, author, pages, borrowed FROM books WHERE id = ?";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_int(stmt,1,id);
-            if(sqlite3_step(stmt)!=SQLITE_ROW){
-                return false;
-            }else{
-                booki = ::book(
-                    sqlite3_column_int(stmt, 0),
-                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
-                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)),
-                    sqlite3_column_int(stmt, 3),
-                    sqlite3_column_int(stmt, 4));
-            }sqlite3_finalize(stmt);
-            break;
-        case 2:
-            sql = "SELECT id, name, age, skin, books FROM authors WHERE id = ?";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_int(stmt,1,id);
-            if(sqlite3_step(stmt)!=SQLITE_ROW){
-                return false;
-            }else{
-                authori = ::author(
-                    sqlite3_column_int(stmt, 0),
-                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
-                    sqlite3_column_int(stmt, 4),
-                    sqlite3_column_int(stmt, 2),
-                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
-            }sqlite3_finalize(stmt);
-            break;
-        case 3:
-            sql = "SELECT id, name, age, salary, pos FROM staff WHERE id = ?";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_int(stmt,1,id);
-            if(sqlite3_step(stmt)!=SQLITE_ROW){
-                return false;
-            }else{
-                staffi = ::staff(
-                    sqlite3_column_int(stmt, 0),
-                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
-                    sqlite3_column_int(stmt, 2),
-                    sqlite3_column_int(stmt, 3),
-                    sqlite3_column_int(stmt, 4));
-            }sqlite3_finalize(stmt);
-            break;
-        }
-    return true;
-}
-
-
 
 
 int database::add(bank nb){
@@ -201,78 +67,6 @@ int database::add(bank nb){
 
     return true;
 }
-
-int database::modify(int table,int id ,book& booki, author& authori, staff& staffi){
-    sqlite3_stmt* stmt;
-    const char* sql;
-    std::string booname=booki.getName();
-    std::string booauth=booki.getAuthor();
-    int boopage=booki.getPages();
-
-    std::string autname=authori.getname();
-    int autage=authori.getage();
-    std::string autskin=authori.getskin();
-
-
-    std::string stafname=staffi.getname();
-    int stafage=staffi.getage();
-    int stafpos=staffi.getpos();
-
-    switch(table){
-        case 1:{
-            sql = "UPDATE books SET name = ?, author = ?, pages = ? WHERE id = ?;";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_int(stmt,4,id);
-            sqlite3_bind_int(stmt,3,boopage);
-            sqlite3_bind_text(stmt,1,booname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt,2,booauth.c_str(), -1, SQLITE_STATIC);
-            sqlite3_step(stmt);
-            sqlite3_finalize(stmt);
-            return sqlite3_changes(db) > 0 ? id : -1;}
-        case 2:
-            sql =  "UPDATE authors SET name = ?, age = ?, skin = ? WHERE id = ?;";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_text(stmt,1,autname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,4,id);
-            sqlite3_bind_text(stmt,3,autskin.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,2,autage);
-            sqlite3_step(stmt); 
-            sqlite3_finalize(stmt);
-            return sqlite3_changes(db) > 0 ? id : -1;
-        case 3:
-            sql =  "UPDATE staff SET name = ?, age = ?, pos = ? WHERE id = ?;";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_text(stmt,1,stafname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,2,stafage);
-            sqlite3_bind_int(stmt,3,stafpos);
-            sqlite3_bind_int(stmt,4,id);
-            sqlite3_step(stmt); 
-            sqlite3_finalize(stmt);
-            return sqlite3_changes(db) > 0 ? id : -1;
-        }
-    return true;
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -352,9 +146,9 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=0,focus=-1;
+        int current_frame=0,frame_delay=75,manag=0,focus=-1,res;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map;
         int vit=0,j;
         std::string name,inter,s1,s2,s3,s4,mes;
         bank newb;
@@ -384,6 +178,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
     SDL_Surface* stars=IMG_Load("assets/star.png");
+    SDL_Surface* maps=IMG_Load("assets/map.png");
 
     for (int i = 1; i <= 5; i++) {
         std::ostringstream s ;
@@ -413,6 +208,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     somal=SDL_CreateTextureFromSurface(renderer,soms);
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     star=SDL_CreateTextureFromSurface(renderer,stars);
+    map=SDL_CreateTextureFromSurface(renderer,maps);
     
     
     SDL_FreeSurface(sb);
@@ -426,6 +222,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(soms);
     SDL_FreeSurface(kirks);
     SDL_FreeSurface(stars);
+    SDL_FreeSurface(maps);
     
 
 }
@@ -436,7 +233,7 @@ void uinter::draw(SDL_Texture* tex, int x,int y ,int w,int h){
 
 void uinter::layout(int* mode){
     if (*mode==1){ //for this time here is the layout : 0 for adding banks , 1 for view/modify , -1 for map , i all add mroe as the project goes on
-        int res=abs(vit%3);
+        res=abs(vit%3);
         sdl.drawtextarea(180,340,300,30);
         sdl.drawtext(100,345,"name :");
         if(!s1.empty()){sdl.drawtext(185,345,s1.c_str());}
@@ -509,6 +306,7 @@ void uinter::layout(int* mode){
         sdl.drawtext(1060,420,"origin :  somal");
         sdl.drawtext(1056,470,"pros :  +security");
         sdl.drawtext(1045,520,"cons :  -reputation");
+        draw(nbutton,440,475,400,400);
         int xs;
         switch(manag){
             case 1 :
@@ -527,6 +325,14 @@ void uinter::layout(int* mode){
         if(manag!=0){
             animate(star,xs,560,60,60,-1);
         }
+    }else if (*mode==12){
+        SDL_Rect mapr={0,0,1280,720};
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapr);
+    
+    
+    
+    
+    
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
     }else if (*mode==-1){
@@ -596,6 +402,14 @@ void uinter::handle(SDL_Event& event,int &mode){
                         manag=3;
                     }else if(checkms(msx,msy,960,150,320,450)){
                         manag=4;
+                    }else if (checkms(msx,msy,440,475,400,400)){
+                        if (manag==-1){
+                            mes="bruh twin choose a damn manager";
+                        }else {
+                            newb.manager=manag;
+                            newb.type=res;
+                            mode=12;
+                        }
                     }
             }
         
