@@ -1,5 +1,5 @@
 #ifndef HEADERS_H
-
+#include <sqlite3.h>
 #include <SDL2/SDL_render.h>
 #include <iostream>
 #include <vector>
@@ -21,8 +21,292 @@ class bank{
         int clients;
         int funds;
         int x,y;
-        
+
 };
+class clients{
+    public:
+        std::string name;
+        int score;
+        std::string bank;
+        int age;
+        int pin;
+}
+
+
+
+
+class database{
+    private:
+        sqlite3* db;
+    public:
+    int opening(int choice);
+    bool search(std::string name); 
+    bool remove(bank nb);
+    int modify(bank nb);
+    int add(bank nb);
+};
+int database::opening(int choice){
+    if(choice==0){
+        sqlite3_open("books.sqlite",&db);
+        const char* createBooksTable = 
+        "CREATE TABLE IF NOT EXISTS books ("
+        "name TEXT PRIMARY KEY AUTOINCREMENT,"
+        "interest INTEGER NOT NULL,"
+        "funds INTEGER NOT NULL,"
+        "clients INTEGER,"
+        "x INTEGER,"
+        "y INTEGER,"
+        ");";
+        if(sqlite3_exec(db, createBooksTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;
+
+        const char* createauthorsTable = 
+        "CREATE TABLE IF NOT EXISTS authors ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "name TEXT NOT NULL,"
+        "age INTEGER,"
+        "skin TEXT NOT NULL,"
+        "books INTEGER"
+        ");";
+        if(sqlite3_exec(db, createauthorsTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;    
+
+        const char* createstaffTable = 
+        "CREATE TABLE IF NOT EXISTS staff ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "name TEXT NOT NULL,"
+        "age INTEGER,"
+        "salary INTEGER,"
+        "pos INTEGER"
+        ");";
+        if(sqlite3_exec(db, createstaffTable, nullptr, nullptr, nullptr)!=SQLITE_OK) return 1;
+        return 0;
+    }else if (choice==1){
+        char* filename = tinyfd_openFileDialog(
+            "Select Database File",
+            "",
+            0,
+            NULL,
+            "SQLite Files (*.sqlite;*.db)",
+            0
+        );
+        if (filename==NULL) return 2;
+        std::string fname(filename);
+        if(fname.size()<7 || fname.substr(fname.size()-7)!=".sqlite"){
+            return 1;
+        }
+        if(sqlite3_open(filename,&db)!=SQLITE_OK) return 1; 
+        int res = sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", nullptr, nullptr, nullptr);
+        if (res!=SQLITE_OK){
+            sqlite3_close(db);
+            db = nullptr;
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+};
+bool database::remove(bank nb) {
+    sqlite3_stmt* stmt;
+    const char* sql;
+    switch(mod) {
+        case 1: 
+            sql = "DELETE FROM books WHERE id = ?";   break;
+        case 2: 
+            sql = "DELETE FROM authors WHERE id = ?"; break;
+        case 3: 
+            sql = "DELETE FROM staff WHERE id = ?";   break;
+        default: return false;
+    }
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+    sqlite3_bind_int(stmt, 1, id);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    return sqlite3_changes(db) > 0;
+}  
+
+bool database::search(int table,int id ,book& booki,author& authori,staff& staffi){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    switch(table){
+        case 1:
+            
+            
+            sql = "SELECT id, name, author, pages, borrowed FROM books WHERE id = ?";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_int(stmt,1,id);
+            if(sqlite3_step(stmt)!=SQLITE_ROW){
+                return false;
+            }else{
+                booki = ::book(
+                    sqlite3_column_int(stmt, 0),
+                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
+                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_int(stmt, 4));
+            }sqlite3_finalize(stmt);
+            break;
+        case 2:
+            sql = "SELECT id, name, age, skin, books FROM authors WHERE id = ?";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_int(stmt,1,id);
+            if(sqlite3_step(stmt)!=SQLITE_ROW){
+                return false;
+            }else{
+                authori = ::author(
+                    sqlite3_column_int(stmt, 0),
+                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
+                    sqlite3_column_int(stmt, 4),
+                    sqlite3_column_int(stmt, 2),
+                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
+            }sqlite3_finalize(stmt);
+            break;
+        case 3:
+            sql = "SELECT id, name, age, salary, pos FROM staff WHERE id = ?";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_int(stmt,1,id);
+            if(sqlite3_step(stmt)!=SQLITE_ROW){
+                return false;
+            }else{
+                staffi = ::staff(
+                    sqlite3_column_int(stmt, 0),
+                    reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)),
+                    sqlite3_column_int(stmt, 2),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_int(stmt, 4));
+            }sqlite3_finalize(stmt);
+            break;
+        }
+    return true;
+}
+
+
+
+
+int database::add(bank nb){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    std::string booname=booki.getName();
+    std::string booauth=booki.getAuthor();
+    int boopage=booki.getPages();
+    bool boowtat=booki.isBorrowed();
+
+    std::string autname=authori.getname();
+    int autage=authori.getage();
+    std::string autskin=authori.getskin();
+    int autbook=authori.getbooks();
+
+    std::string stafname=staffi.getname();
+    int stafage=staffi.getage();
+    int stafpos=staffi.getpos();
+    int stafsalary=staffi.getsalary();
+
+    switch(table){
+        case 1:{
+            
+            
+            sql = "INSERT INTO books (name, author, pages,borrowed) VALUES (?, ?, ?,?);";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_int(stmt,3,boopage);
+            sqlite3_bind_text(stmt,1,booname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt,2,booauth.c_str(), -1, SQLITE_STATIC);
+            int boostat = boowtat ? 1 : 0;
+            sqlite3_bind_int(stmt, 4, boostat);
+            if(sqlite3_step(stmt)!=SQLITE_DONE){
+                return -1;
+            }return (int)sqlite3_last_insert_rowid(db);}
+        case 2:
+            sql = "INSERT INTO authors (name, age, skin, books) VALUES (?, ?, ?,?);";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_text(stmt,1,autname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,2,autage);
+            sqlite3_bind_text(stmt,3,autskin.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,4,autbook);
+            if(sqlite3_step(stmt)!=SQLITE_DONE){
+                return -1;
+            }return (int)sqlite3_last_insert_rowid(db);
+        case 3:
+            sql = "INSERT INTO staff (name, age, pos, salary) VALUES (?, ?, ?,?);";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_text(stmt,1,stafname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,2,stafage);
+            sqlite3_bind_int(stmt,3,stafpos);
+            sqlite3_bind_int(stmt,4,stafsalary);
+            if(sqlite3_step(stmt)!=SQLITE_DONE){
+                return -1;
+            }return (int)sqlite3_last_insert_rowid(db);
+        }
+    return true;
+}
+
+int database::modify(int table,int id ,book& booki, author& authori, staff& staffi){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    std::string booname=booki.getName();
+    std::string booauth=booki.getAuthor();
+    int boopage=booki.getPages();
+
+    std::string autname=authori.getname();
+    int autage=authori.getage();
+    std::string autskin=authori.getskin();
+
+
+    std::string stafname=staffi.getname();
+    int stafage=staffi.getage();
+    int stafpos=staffi.getpos();
+
+    switch(table){
+        case 1:{
+            sql = "UPDATE books SET name = ?, author = ?, pages = ? WHERE id = ?;";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_int(stmt,4,id);
+            sqlite3_bind_int(stmt,3,boopage);
+            sqlite3_bind_text(stmt,1,booname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt,2,booauth.c_str(), -1, SQLITE_STATIC);
+            sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            return sqlite3_changes(db) > 0 ? id : -1;}
+        case 2:
+            sql =  "UPDATE authors SET name = ?, age = ?, skin = ? WHERE id = ?;";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_text(stmt,1,autname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,4,id);
+            sqlite3_bind_text(stmt,3,autskin.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,2,autage);
+            sqlite3_step(stmt); 
+            sqlite3_finalize(stmt);
+            return sqlite3_changes(db) > 0 ? id : -1;
+        case 3:
+            sql =  "UPDATE staff SET name = ?, age = ?, pos = ? WHERE id = ?;";
+            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+            sqlite3_bind_text(stmt,1,stafname.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt,2,stafage);
+            sqlite3_bind_int(stmt,3,stafpos);
+            sqlite3_bind_int(stmt,4,id);
+            sqlite3_step(stmt); 
+            sqlite3_finalize(stmt);
+            return sqlite3_changes(db) > 0 ? id : -1;
+        }
+    return true;
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
 
 
 
