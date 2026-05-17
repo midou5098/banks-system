@@ -20,6 +20,8 @@ class bank{
         int manager;
         int clients;
         int funds;
+        int x,y;
+        
 };
 
 
