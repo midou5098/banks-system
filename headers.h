@@ -201,9 +201,9 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* maps4=IMG_Load("assets/map/mapmm.png");
     SDL_Surface* maps5=IMG_Load("assets/map/maptm.png");
     SDL_Surface* maps6=IMG_Load("assets/map/mapbm.png");
-    SDL_Surface* maps7=IMG_Load("assets/map/maprt.png");
-    SDL_Surface* maps8=IMG_Load("assets/map/maprm.png");
-    SDL_Surface* maps9=IMG_Load("assets/map/maprb.png");
+    SDL_Surface* maps7=IMG_Load("assets/map/maptr.png");
+    SDL_Surface* maps8=IMG_Load("assets/map/mapmr.png");
+    SDL_Surface* maps9=IMG_Load("assets/map/mapbr.png");
 
 
 
@@ -410,10 +410,26 @@ void uinter::handle(SDL_Event& event,int &mode){
                             else if(focus==3 && s3.length()<10) s4+=c;}
                             
                 }
+                break;
             case 12:
                 if(key==SDLK_RIGHT){
-                    worldx+=50;
+                    if ( worldx-40>=-1280){
+                        worldx-=40;
+                    }
+                }else if(key==SDLK_LEFT){
+                    if (worldx+40<=3840 && worldx+40>=-1280){
+                        worldx+=40;
+                    }
+                }else if(key==SDLK_UP){
+                    if (worldy-40<=1440 && worldy-40>-720){
+                        worldy-=40;
+                    }
+                }else if(key==SDLK_DOWN){
+                    if (worldy+40<3840 && worldy+40>-720){
+                        worldy+=40;
+                    }
                 }
+                break;
 
         }
 //aint gon lie , miss u , but gawd dayum u dunno how much i m disgusted by you , the thought of u became a reason to vomit , not even hate or guilt , pure disgust .
