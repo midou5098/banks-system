@@ -351,17 +351,17 @@ void uinter::layout(int* mode){
             animate(star,xs,560,60,60,-1);
         }
     }else if (*mode==12){
-        SDL_Rect rmaptl={0,0,1280,720};
-        SDL_Rect rmapml={-1280,-720,1280,720};
-        SDL_Rect rmapbl={-1280,0,1280,720};
+        SDL_Rect rmaptl={-1280,-720,1280,720};
+        SDL_Rect rmapml={-1280,0,1280,720};
+        SDL_Rect rmapbl={-1280,720,1280,720};
 
         SDL_Rect rmaptm={0,-720,1280,720};
         SDL_Rect rmapmm={0,0,1280,720};
         SDL_Rect rmapbm={0,720,1280,720};
 
-        SDL_Rect rmaptr={0,0,1280,720};
-        SDL_Rect rmapmr={-1280,-720,1280,720};
-        SDL_Rect rmapbr={-1280,0,1280,720};
+        SDL_Rect rmaptr={1280,-720,1280,720};
+        SDL_Rect rmapmr={1280,0,1280,720};
+        SDL_Rect rmapbr={1280,720,1280,720};
         
 
         SDL_RenderCopy(sdl.getrender(),maptl,NULL,&rmaptl);
