@@ -154,15 +154,18 @@ class uinter{
         bank newb;
 
     public:
-        uinter(SDLinit& sdlo,database& dbo);
+        
         void layout(int* mode);
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
         bool checkms(int msx,int msy,int x,int y,int w,int h);
+        
         void shuffle(void){j=rand()%5;};
-};
+        uinter(SDLinit& sdlo,database& dbo);
+    };
 uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
+    
     shuffle();
 
     SDL_Renderer* renderer=sdl.getrender();

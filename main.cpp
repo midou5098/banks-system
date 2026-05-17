@@ -5,7 +5,7 @@
 
 
 int main(void){
-    int mode=11;
+    int mode=12;
     SDLinit sdl(1280,720);
     database cap(void);
     uinter uic(sdl,cap);
