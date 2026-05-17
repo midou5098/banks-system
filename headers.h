@@ -30,7 +30,7 @@ class clients{
         std::string bank;
         int age;
         int pin;
-}
+};
 
 
 
@@ -184,56 +184,19 @@ bool database::search(int table,int id ,book& booki,author& authori,staff& staff
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
-    std::string booname=booki.getName();
-    std::string booauth=booki.getAuthor();
-    int boopage=booki.getPages();
-    bool boowtat=booki.isBorrowed();
-
-    std::string autname=authori.getname();
-    int autage=authori.getage();
-    std::string autskin=authori.getskin();
-    int autbook=authori.getbooks();
-
-    std::string stafname=staffi.getname();
-    int stafage=staffi.getage();
-    int stafpos=staffi.getpos();
-    int stafsalary=staffi.getsalary();
-
-    switch(table){
-        case 1:{
-            
-            
-            sql = "INSERT INTO books (name, author, pages,borrowed) VALUES (?, ?, ?,?);";
+            sql = "INSERT INTO banks (name, manager, interest, funds, clients, x, y) VALUES (? ,? , ?, ?, ?, ?, ?);";
             sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_int(stmt,3,boopage);
-            sqlite3_bind_text(stmt,1,booname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt,2,booauth.c_str(), -1, SQLITE_STATIC);
-            int boostat = boowtat ? 1 : 0;
-            sqlite3_bind_int(stmt, 4, boostat);
-            if(sqlite3_step(stmt)!=SQLITE_DONE){
-                return -1;
-            }return (int)sqlite3_last_insert_rowid(db);}
-        case 2:
-            sql = "INSERT INTO authors (name, age, skin, books) VALUES (?, ?, ?,?);";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_text(stmt,1,autname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,2,autage);
-            sqlite3_bind_text(stmt,3,autskin.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,4,autbook);
+            sqlite3_bind_text(stmt,1,nb.name.c_str(),-1,SQLITE_STATIC);
+            sqlite3_bind_int(stmt, 2, nb.manager);
+            sqlite3_bind_int(stmt, 3, nb.inter);
+            sqlite3_bind_int(stmt, 4, nb.funds);
+            sqlite3_bind_int(stmt, 5, nb.clients);
+            sqlite3_bind_int(stmt, 6, nb.x);
+            sqlite3_bind_int(stmt, 7, nb.y);
             if(sqlite3_step(stmt)!=SQLITE_DONE){
                 return -1;
             }return (int)sqlite3_last_insert_rowid(db);
-        case 3:
-            sql = "INSERT INTO staff (name, age, pos, salary) VALUES (?, ?, ?,?);";
-            sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-            sqlite3_bind_text(stmt,1,stafname.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt,2,stafage);
-            sqlite3_bind_int(stmt,3,stafpos);
-            sqlite3_bind_int(stmt,4,stafsalary);
-            if(sqlite3_step(stmt)!=SQLITE_DONE){
-                return -1;
-            }return (int)sqlite3_last_insert_rowid(db);
-        }
+
     return true;
 }
 
@@ -386,6 +349,7 @@ std::vector<SDL_Texture*> tips;
 class uinter{
     private:
         SDLinit& sdl;
+        database& db;
         int current_frame=0,frame_delay=75,manag=0,focus=-1;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star;
@@ -394,7 +358,7 @@ class uinter{
         bank newb;
 
     public:
-        uinter(SDLinit& sdlo);
+        uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){};
         void layout(int* mode);
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
@@ -402,7 +366,7 @@ class uinter{
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         void shuffle(void){j=rand()%5;};
 };
-uinter::uinter(SDLinit& sdlo):sdl(sdlo){
+uinter::uinter(SDLinit& sdlo,database& dbo){
     shuffle();
 
     SDL_Renderer* renderer=sdl.getrender();
