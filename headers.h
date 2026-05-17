@@ -17,6 +17,7 @@ class bank{
     public:
         std::string name;
         int inter;
+        int type;
         int manager;
         int clients;
         int funds;
@@ -184,15 +185,16 @@ bool database::search(int table,int id ,book& booki,author& authori,staff& staff
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
-            sql = "INSERT INTO banks (name, manager, interest, funds, clients, x, y) VALUES (? ,? , ?, ?, ?, ?, ?);";
+            sql = "INSERT INTO banks (name, type, manager, interest, funds, clients, x, y) VALUES (? , ?, ? , ?, ?, ?, ?, ?);";
             sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
             sqlite3_bind_text(stmt,1,nb.name.c_str(),-1,SQLITE_STATIC);
-            sqlite3_bind_int(stmt, 2, nb.manager);
-            sqlite3_bind_int(stmt, 3, nb.inter);
-            sqlite3_bind_int(stmt, 4, nb.funds);
-            sqlite3_bind_int(stmt, 5, nb.clients);
-            sqlite3_bind_int(stmt, 6, nb.x);
-            sqlite3_bind_int(stmt, 7, nb.y);
+            sqlite3_bind_int(stmt, 2, nb.y);
+            sqlite3_bind_int(stmt, 3, nb.manager);
+            sqlite3_bind_int(stmt, 4, nb.inter);
+            sqlite3_bind_int(stmt, 5, nb.funds);
+            sqlite3_bind_int(stmt, 6, nb.clients);
+            sqlite3_bind_int(stmt, 7, nb.x);
+            sqlite3_bind_int(stmt, 8, nb.y);
             if(sqlite3_step(stmt)!=SQLITE_DONE){
                 return -1;
             }return (int)sqlite3_last_insert_rowid(db);
@@ -358,7 +360,7 @@ class uinter{
         bank newb;
 
     public:
-        uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){};
+        uinter(SDLinit& sdlo,database& dbo);
         void layout(int* mode);
         void handle(SDL_Event& event,int &mode);
         void animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir);
@@ -366,7 +368,7 @@ class uinter{
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         void shuffle(void){j=rand()%5;};
 };
-uinter::uinter(SDLinit& sdlo,database& dbo){
+uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     shuffle();
 
     SDL_Renderer* renderer=sdl.getrender();
