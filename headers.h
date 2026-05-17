@@ -329,8 +329,30 @@ void uinter::layout(int* mode){
             animate(star,xs,560,60,60,-1);
         }
     }else if (*mode==12){
-        SDL_Rect mapr={0,0,1280,720};
-        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapr);
+        SDL_Rect maptl={0,0,1280,720};
+        SDL_Rect mapml={-1280,-720,1280,720};
+        SDL_Rect mapbl={-1280,0,1280,720};
+
+        SDL_Rect maptm={0,-720,1280,720};
+        SDL_Rect mapmm={0,0,1280,720};
+        SDL_Rect mapbm={0,720,1280,720};
+
+        SDL_Rect maptr={0,0,1280,720};
+        SDL_Rect mapmr={-1280,-720,1280,720};
+        SDL_Rect mapbr={-1280,0,1280,720};
+        
+
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptl);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapml);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapbl);
+        
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptm);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmm);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmm);
+
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&maptr);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapmr);
+        SDL_RenderCopy(sdl.getrender(),map,NULL,&mapbm);
     
     
     

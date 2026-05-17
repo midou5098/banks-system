@@ -7,7 +7,7 @@
 int main(void){
     int mode=12;
     SDLinit sdl(1280,720);
-    database cap(void);
+    database cap;
     uinter uic(sdl,cap);
     bool running =true;
     SDL_Event event;
