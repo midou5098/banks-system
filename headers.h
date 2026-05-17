@@ -156,7 +156,7 @@ class uinter{
         SDL_Texture* mapst[9];
         SDL_Rect rect[9];
         bank newb;
-        bool isdrg=false;
+        bool isdrg=false,fs=false;
 
     public:
         
@@ -366,18 +366,33 @@ void uinter::layout(int* mode){
             animate(star,xs,560,60,60,-1);
         }
     }else if (*mode==12){
-        rect[0]={worldx,worldy,1280,720};
-        rect[1]={worldx,worldy+720,1280,720};
-        rect[2]={worldx,worldy+1440,1280,720};
+        if(!fs){
+            rect[0]={worldx,worldy,1280,720};
+            rect[1]={worldx,worldy+720,1280,720};
+            rect[2]={worldx,worldy+1440,1280,720};
 
-        rect[3]={worldx+1280,worldy,1280,720};
-        rect[4]={worldx+1280,worldy+720,1280,720};
-        rect[5]={worldx+1280,worldy+1440,1280,720};
+            rect[3]={worldx+1280,worldy,1280,720};
+            rect[4]={worldx+1280,worldy+720,1280,720};
+            rect[5]={worldx+1280,worldy+1440,1280,720};
 
-        rect[6]={worldx+2480,worldy,1280,720};
-        rect[7]={worldx+2480,worldy+720,1280,720};
-        rect[8]={worldx+2480,worldy+1440,1280,720};
-        viewport();
+            rect[6]={worldx+2480,worldy,1280,720};
+            rect[7]={worldx+2480,worldy+720,1280,720};
+            rect[8]={worldx+2480,worldy+1440,1280,720};
+            viewport();
+        }else{
+            rect[0]={0,0,426,240};
+            rect[1]={426,0,426,240};
+            rect[2]={852,0,428,240};
+
+            rect[3]={0,240,426,240};
+            rect[4]={426,240,426,240};
+            rect[5]={852,240,428,240};
+
+            rect[6]={0,480,426,240};
+            rect[7]={426,480,426,240};
+            rect[8]={852,480,428,240};
+            viewport();
+        }
         
 
         
@@ -414,6 +429,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                 }
                 break;
             case 12:
+                if(key==SDLK_f){
+                    fs=!fs;
+                }
                 if(key==SDLK_RIGHT){
                     if ( worldx-40>=-2480){
                         worldx-=40;
@@ -486,11 +504,13 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }
                     break;
                 case 12:
-                    isdrg=true;
-                    dragsx=event.button.x;
-                    dragsy=event.button.y;
-                    lsx=event.button.x;
-                    lsy=event.button.y;
+                    if (fs==false){
+                        isdrg=true;
+                        dragsx=event.button.x;
+                        dragsy=event.button.y;
+                        lsx=event.button.x;
+                        lsy=event.button.y;
+                    }
                     
 
 
@@ -499,17 +519,22 @@ void uinter::handle(SDL_Event& event,int &mode){
         
         }
     }else if (event.type==SDL_MOUSEMOTION){
-        if(isdrg){
-            int drgdx=event.motion.x-lsx;
-            int drgdy=event.motion.y-lsy;
-            if ( worldx+drgdx*0.1f>=-2480 && worldx+drgdx*0.1f<=0){
-                    worldx+=drgdx*0.1f;}
-            if (worldy+drgdy*0.1f<=0 && worldy+drgdy*0.1f>=-1440){
-                    worldy+=drgdy*0.1f;
-                }
+        if(!fs){
+            if(isdrg){
+                int drgdx=event.motion.x-lsx;
+                int drgdy=event.motion.y-lsy;
+                if ( worldx+drgdx*0.1f>=-2480 && worldx+drgdx*0.1f<=0){
+                        worldx+=drgdx*0.1f;}
+                if (worldy+drgdy*0.1f<=0 && worldy+drgdy*0.1f>=-1440){
+                        worldy+=drgdy*0.1f;
+                    }
+        }
+
         }
     }else if (event.type==SDL_MOUSEBUTTONUP){
-        isdrg=false;
+        if(!fs){
+            isdrg=false;
+        }
     }
     
 }
