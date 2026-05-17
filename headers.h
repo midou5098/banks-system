@@ -365,7 +365,7 @@ void uinter::layout(int* mode){
         if(manag!=0){
             animate(star,xs,560,60,60,-1);
         }
-    }else if (*mode==12){
+    }else if (*mode==-1){
         if(!fs){
             rect[0]={worldx,worldy,1280,720};
             rect[1]={worldx,worldy+720,1280,720};
@@ -398,8 +398,38 @@ void uinter::layout(int* mode){
         
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
-    }else if (*mode==-1){
-        sdl.drawtext(500,300,"viewing map");
+    }else if(*mode==12){
+        rect[0]={160,90,320,180};
+        rect[1]={480,90,320,180};
+        rect[2]={800,90,320,180};
+
+        rect[3]={160,270,320,180};
+        rect[4]={480,270,320,180};
+        rect[5]={800,270,320,180};
+
+        rect[6]={160,450,320,180};
+        rect[7]={480,450,320,180};
+        rect[8]={800,450,320,180};
+        viewport();
+        draw(nbutton,440,475,400,400);
+    }else if (*mode==13){
+        sdl.drawtext(500,50,"<=FINAL REVIEW=>");
+        SDL_SetRenderDrawColor(sdl.getrender(),0,0,0,255);
+        sdl.line(426,100,426,600);
+        sdl.line(854,100,854,600);
+
+        switch(res){
+            case 0:
+                
+        }
+
+
+
+
+
+
+
+        draw(nbutton,440,475,400,400);
     }
 }
 void uinter::handle(SDL_Event& event,int &mode){
@@ -432,21 +462,23 @@ void uinter::handle(SDL_Event& event,int &mode){
                 if(key==SDLK_f){
                     fs=!fs;
                 }
-                if(key==SDLK_RIGHT){
-                    if ( worldx-40>=-2480){
-                        worldx-=40;
-                    }
-                }else if(key==SDLK_LEFT){
-                    if (worldx+40<=0){
-                        worldx+=40;
-                    }
-                }else if(key==SDLK_UP){
-                    if (worldy+40<=0){
-                        worldy+=40;
-                    }
-                }else if(key==SDLK_DOWN){
-                    if (worldy-40>=-1440){
-                        worldy-=40;
+                if(!fs){
+                    if(key==SDLK_RIGHT){
+                        if ( worldx-40>=-2480){
+                            worldx-=40;
+                        }
+                    }else if(key==SDLK_LEFT){
+                        if (worldx+40<=0){
+                            worldx+=40;
+                        }
+                    }else if(key==SDLK_UP){
+                        if (worldy+40<=0){
+                            worldy+=40;
+                        }
+                    }else if(key==SDLK_DOWN){
+                        if (worldy-40>=-1440){
+                            worldy-=40;
+                        }
                     }
                 }
                 break;
@@ -503,7 +535,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         }
                     }
                     break;
-                case 12:
+                case -1:
                     if (fs==false){
                         isdrg=true;
                         dragsx=event.button.x;
@@ -511,11 +543,19 @@ void uinter::handle(SDL_Event& event,int &mode){
                         lsx=event.button.x;
                         lsy=event.button.y;
                     }
+                    break;
+                case 12:{
+                    if (checkms(msx,msy,160,90,1120,630)){
+                        newb.x=((msx-320)/1120)*1280;
+                        newb.y=((msy-180)/630)*720;
+                    }
+                    break;}
+                    
                     
 
 
                     
-            }
+            
         
         }
     }else if (event.type==SDL_MOUSEMOTION){
@@ -532,12 +572,14 @@ void uinter::handle(SDL_Event& event,int &mode){
 
         }
     }else if (event.type==SDL_MOUSEBUTTONUP){
-        if(!fs){
+        if (mode==-1){
+            if(!fs){
             isdrg=false;
+        }
         }
     }
     
-}
+}}
 void uinter::animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir){
         int W,H;
         SDL_QueryTexture(seleanim,NULL,NULL,&W,&H);
