@@ -1,3 +1,4 @@
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
 #ifndef HEADERS_H
 #include <sqlite3.h>
@@ -150,11 +151,12 @@ class uinter{
         int current_frame=0,frame_delay=75,manag=0,focus=-1,res,nx,ny;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33;
-        int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0;
+        int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
         SDL_Rect rect[9];
         bank newb;
+        bool isdrg=false;
 
     public:
         
@@ -479,11 +481,35 @@ void uinter::handle(SDL_Event& event,int &mode){
                             newb.manager=manag;
                             newb.type=res;
                             mode=12;
+
                         }
                     }
+                    break;
+                case 12:
+                    isdrg=true;
+                    dragsx=event.button.x;
+                    dragsy=event.button.y;
+                    lsx=event.button.x;
+                    lsy=event.button.y;
+                    
+
+
+                    
             }
         
         }
+    }else if (event.type==SDL_MOUSEMOTION){
+        if(isdrg){
+            int drgdx=event.motion.x-lsx;
+            int drgdy=event.motion.y-lsy;
+            if ( worldx+drgdx*0.1f>=-2480 && worldx+drgdx*0.1f<=0){
+                    worldx+=drgdx*0.1f;}
+            if (worldy+drgdy*0.1f<=0 && worldy+drgdy*0.1f>=-1440){
+                    worldy+=drgdy*0.1f;
+                }
+        }
+    }else if (event.type==SDL_MOUSEBUTTONUP){
+        isdrg=false;
     }
     
 }
