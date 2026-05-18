@@ -348,8 +348,7 @@ void uinter::layout(int* mode){
         sdl.drawtext(1045,520,"cons :  -reputation");
         draw(nbutton,440,475,400,400);
         
-        sdl.drawtext(1060,370,"coords : ");
-        sdl.drawtext(1060,4250,"location , god knows where ... ");
+        
         
         
         int xs;
@@ -491,7 +490,11 @@ void uinter::layout(int* mode){
         sdl.drawtext(50,420,"interest rate :         "+s2+"%");
         sdl.drawtext(120,455,"funds :        "+s3+"billions");
         sdl.drawtext(120,490,"clients :      "+s4);
-
+        sdl.drawtext(900,400,"coords : "+std::to_string(newb.x)+" , "+std::to_string(newb.y));
+        sdl.drawtext(900,450,"location:   god knows where ....");
+        if (isdrg){
+            std::cout<<"dragging";
+        }
 
 
 
@@ -525,11 +528,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                             
                 }
                 break;
-            case 12:
+            case -1:
                 if(key==SDLK_f){
                     fs=!fs;
                 }
-                if(!fs){
+                if(fs==false){
                     if(key==SDLK_RIGHT){
                         if ( worldx-40>=-2480){
                             worldx-=40;
@@ -619,7 +622,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }
 
                     break;}
-                    
+                case 13:
+                    if (checkms(msx,msy,440,475,400,400)){
+                        mode=-1;
+                    }
                     
 
 
@@ -627,28 +633,29 @@ void uinter::handle(SDL_Event& event,int &mode){
             
         
         }
+    }
     }else if (event.type==SDL_MOUSEMOTION){
-        if(!fs){
+        if(fs==false){
             if(isdrg){
                 int drgdx=event.motion.x-lsx;
                 int drgdy=event.motion.y-lsy;
-                if ( worldx+drgdx*0.1f>=-2480 && worldx+drgdx*0.1f<=0){
-                        worldx+=drgdx*0.1f;}
-                if (worldy+drgdy*0.1f<=0 && worldy+drgdy*0.1f>=-1440){
-                        worldy+=drgdy*0.1f;
+                if ( worldx+drgdx*0.6f>=-2480 && worldx+drgdx*0.6f<=0){
+                        worldx+=drgdx*0.6f;}
+                if (worldy+drgdy*0.6f<=0 && worldy+drgdy*0.6f>=-1440){
+                        worldy+=drgdy*0.6f;
                     }
+                lsx = event.motion.x;  
+                lsy = event.motion.y; 
         }
 
         }
     }else if (event.type==SDL_MOUSEBUTTONUP){
         if (mode==-1){
-            if(!fs){
             isdrg=false;
-        }
         }
     }
     
-}}
+}
 void uinter::animate(SDL_Texture* seleanim,int px,int py,int w,int h,int dir){
         int W,H;
         SDL_QueryTexture(seleanim,NULL,NULL,&W,&H);
