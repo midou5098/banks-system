@@ -91,11 +91,11 @@ int database::add(bank nb){
             sqlite3_bind_int(stmt, 6, nb.manager);
             sqlite3_bind_double(stmt, 7, nb.x);
             sqlite3_bind_double(stmt, 8, nb.y);
-            if(sqlite3_step(stmt)!=SQLITE_DONE){
-                std::cout << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+            int result = sqlite3_step(stmt);
+            sqlite3_finalize(stmt); 
+            if (result != SQLITE_DONE) {
                 return -1;
-            }return (int)sqlite3_last_insert_rowid(db);
-
+            }
     return true;
 }
 
@@ -181,7 +181,7 @@ class uinter{
         database& db;
         int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny;
         Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
@@ -213,9 +213,7 @@ void uinter::viewport(void){
 }
 uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     shuffle();
-
     SDL_Renderer* renderer=sdl.getrender();
-
     SDL_Surface* sb=IMG_Load("assets/bbank.png");
     SDL_Surface* sm=IMG_Load("assets/mbank.png");
     SDL_Surface* sc=IMG_Load("assets/cbank.png");
@@ -227,6 +225,12 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
     SDL_Surface* stars=IMG_Load("assets/star.png");
+    SDL_Surface* abs=IMG_Load("assets/buttons/adbnk.png");
+    SDL_Surface* sbs=IMG_Load("assets/buttons/searchbnk.png");
+    SDL_Surface* dbs=IMG_Load("assets/buttons/delbnk.png");
+    SDL_Surface* ns=IMG_Load("assets/buttons/newsbnk.png");
+    SDL_Surface* lbs=IMG_Load("assets/buttons/lockbnk.png");
+    
 
     SDL_Surface* maps1=IMG_Load("assets/map/maptl.png");
     SDL_Surface* maps2=IMG_Load("assets/map/mapml.png");
@@ -270,6 +274,11 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     somal=SDL_CreateTextureFromSurface(renderer,soms);
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     star=SDL_CreateTextureFromSurface(renderer,stars);
+    ab=SDL_CreateTextureFromSurface(renderer,ads);
+    sbu=SDL_CreateTextureFromSurface(renderer,sbs);
+    dbu=SDL_CreateTextureFromSurface(renderer,dbs);
+    lb=SDL_CreateTextureFromSurface(renderer,lbs);
+    nb=SDL_CreateTextureFromSurface(renderer,ns);
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -294,6 +303,11 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(soms);
     SDL_FreeSurface(kirks);
     SDL_FreeSurface(stars);
+    SDL_FreeSurface(sbs);
+    SDL_FreeSurface(abs);
+    SDL_FreeSurface(dbs);
+    SDL_FreeSurface(lbs);
+    SDL_FreeSurface(ns);
     
 
 }
@@ -428,6 +442,18 @@ void uinter::layout(int* mode){
             rect[8]={852,480,428,240};
             viewport();
         }
+        SDL_Rect rec1={1180,75,600,450};
+        SDL_Rect rec2={1060,75,600,450};
+        SDL_Rect rec3={940,75,600,450};
+        SDL_Rect rec4={820,75,600,450};
+        SDL_Rect rec5={300,25,600,450};
+        SDL_Renderer* renderer=sdl.getrender();
+        SDL_RenderCopy(renderer,ab,NULL,&rec1);
+        SDL_RenderCopy(renderer,sbu,NULL,&rec2);
+        SDL_RenderCopy(renderer,dbu,NULL,&rec3);
+        SDL_RenderCopy(renderer,lb,NULL,&rec4);
+        SDL_RenderCopy(renderer,nb,NULL,&rec5);
+        
         
 
         
