@@ -81,14 +81,14 @@ int database::opening(void){
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
-            sql = "INSERT INTO banks (name, type, manager, interest, funds, clients, x, y) VALUES (? , ?, ? , ?, ?, ?, ?, ?);";
+            sql = "INSERT INTO banks (name, type, interest, funds, clients, manager, x, y) VALUES (? , ?, ? , ?, ?, ?, ?, ?);";
             sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
             sqlite3_bind_text(stmt,1,nb.name.c_str(),-1,SQLITE_STATIC);
             sqlite3_bind_int(stmt, 2, nb.type);
-            sqlite3_bind_int(stmt, 3, nb.manager);
-            sqlite3_bind_int(stmt, 4, nb.inter);
-            sqlite3_bind_int(stmt, 5, nb.funds);
-            sqlite3_bind_int(stmt, 6, nb.clients);
+            sqlite3_bind_int(stmt, 3, nb.inter);
+            sqlite3_bind_int(stmt, 4, nb.funds);
+            sqlite3_bind_int(stmt, 5, nb.clients);
+            sqlite3_bind_int(stmt, 6, nb.manager);
             sqlite3_bind_int(stmt, 7, nb.x);
             sqlite3_bind_int(stmt, 8, nb.y);
             if(sqlite3_step(stmt)!=SQLITE_DONE){
@@ -575,6 +575,8 @@ void uinter::handle(SDL_Event& event,int &mode){
             case -1:
                 if(key==SDLK_f){
                     fs=!fs;
+                }else if (key==SDLK_a){
+                    mode=1;
                 }
                 if(fs==false){
                     if(key==SDLK_RIGHT){
@@ -668,6 +670,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;}
                 case 13:
                     if (checkms(msx,msy,440,475,400,400)){
+                        if(db.add(newb)==1){
+                            mes="bank addded";
+                        }else{
+                            mes="u fucked up twin";
+                        }
                         mode=-1;
                     }
                     break;
