@@ -58,29 +58,26 @@ int database::opening(void){
     
 
     nfdu8char_t *outPath;
-    nfdu8filteritem_t filters[2] = { { "Source code", "c,cpp,cc" }, { "Headers", "h,hpp" } };
+    nfdu8filteritem_t filters[1] = { { "Source code", "db" }};
     nfdopendialogu8args_t args;
     args.filterList   = filters;
     args.filterCount  = 1;
     args.defaultPath  = nullptr;
     args.parentWindow = {0};
-    args.filterList = filters;
-    args.filterCount = 2;
     nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
     if (result == NFD_OKAY)
     {
         puts("Success!");
         puts(outPath);
-        NFD_FreePathU8(outPath);
     }
     if(sqlite3_open(outPath,&db)!=SQLITE_OK) return 1; 
         int res = sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", nullptr, nullptr, nullptr);
         if (res!=SQLITE_OK){
             sqlite3_close(db);
             db = nullptr;
-            return 1;
+            return 0;
         }
-        return 0;}
+        return 1;}
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
