@@ -338,15 +338,20 @@ void uinter::layout(int* mode){
         sdl.drawtext(415,520,"cons :  -clients");
 
         sdl.drawtext(740,370,"name : adolf");
-        sdl.drawtext(720,420,"origin :  germany");
+        sdl.drawtext(720,420,"origin :   germany");
         sdl.drawtext(730,470,"pros :  +reputaion");
         sdl.drawtext(705,520,"cons :  -banks relations");
 
         sdl.drawtext(1060,370,"name : captain");
-        sdl.drawtext(1060,420,"origin :  somal");
+        sdl.drawtext(1060,420,"origin :   somal");
         sdl.drawtext(1056,470,"pros :  +security");
         sdl.drawtext(1045,520,"cons :  -reputation");
         draw(nbutton,440,475,400,400);
+        
+        sdl.drawtext(1060,370,"coords : ");
+        sdl.drawtext(1060,4250,"location , god knows where ... ");
+        
+        
         int xs;
         switch(manag){
             case 1 :
@@ -421,11 +426,11 @@ void uinter::layout(int* mode){
         switch(res){
             case 0:
                 draw(cbank,20,20,400,400);
-                sdl.drawtext(215,350,"country bank");
+                sdl.drawtext(215,340,"country bank");
                 break;
             case 1:
                 draw(mbank,20,20,400,400);
-                sdl.drawtext(130,350,"modern bank");
+                sdl.drawtext(130,340,"modern bank");
                 break;
             case 2:
                 draw(bbank,20,-30,400,400);
@@ -436,6 +441,35 @@ void uinter::layout(int* mode){
         switch(manag){
             case 1:
                 draw(jew,450,100,400,200);
+                sdl.drawtext(556,325," manager :   jew");
+                sdl.drawtext(570,370,"name : shlomo");
+                sdl.drawtext(565,420,"origin :   obvious...");
+                sdl.drawtext(545,470,"pros :  +bank relations");
+                sdl.drawtext(565,520,"cons :  -reputaion");
+                break;
+            case 2:
+                draw(kirk,450,100,400,200);
+                sdl.drawtext(556,325," manager :   fraud");
+                sdl.drawtext(570,370,"name : kirk");
+                sdl.drawtext(565,420,"origin :   america");
+                sdl.drawtext(545,470,"pros :  +funds");
+                sdl.drawtext(565,520,"cons :  -clinets");
+                break;
+            case 3:
+                draw(adolf,450,100,400,200);
+                sdl.drawtext(556,325," manager :  hero");
+                sdl.drawtext(570,370,"name : adolf");
+                sdl.drawtext(565,420,"origin :   germany");
+                sdl.drawtext(545,470,"pros :  +reputation");
+                sdl.drawtext(565,520,"cons :  -banks relations");
+                break;
+            case 4:
+                draw(somal,450,100,400,200);
+                sdl.drawtext(556,325," manager :   boss");
+                sdl.drawtext(570,370,"name : captain");
+                sdl.drawtext(565,420,"origin :   somal");
+                sdl.drawtext(545,470,"pros :  +security");
+                sdl.drawtext(565,520,"cons :  -reputaion");
         }
         rect[0]={890,120,120,80};
         rect[1]={1010,120,120,80};
@@ -449,9 +483,14 @@ void uinter::layout(int* mode){
         rect[7]={1010,260,120,80};
         rect[8]={1130,260,120,80};
         viewport();
-        
-
-
+        s1="niggs.co";
+        s2="20";
+        s3="30";
+        s4="545";
+        sdl.drawtext(120,385,"name :         "+s1);
+        sdl.drawtext(50,420,"interest rate :         "+s2+"%");
+        sdl.drawtext(120,455,"funds :        "+s3+"billions");
+        sdl.drawtext(120,490,"clients :      "+s4);
 
 
 
