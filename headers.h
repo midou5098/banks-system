@@ -148,7 +148,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=0,focus=-1,res,nx,ny;
+        int current_frame=0,frame_delay=75,manag=1,focus=-1,res=1,nx,ny;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -420,8 +420,36 @@ void uinter::layout(int* mode){
 
         switch(res){
             case 0:
-                
+                draw(cbank,20,20,400,400);
+                sdl.drawtext(215,350,"country bank");
+                break;
+            case 1:
+                draw(mbank,20,20,400,400);
+                sdl.drawtext(130,350,"modern bank");
+                break;
+            case 2:
+                draw(bbank,20,-30,400,400);
+                sdl.drawtext(140,300,"billionaires bank");
+                break;
         }
+
+        switch(manag){
+            case 1:
+                draw(jew,450,100,400,200);
+        }
+        rect[0]={890,120,120,80};
+        rect[1]={1010,120,120,80};
+        rect[2]={1130,120,120,80};
+
+        rect[3]={890,180,120,80};
+        rect[4]={1010,180,120,80};
+        rect[5]={1130,180,120,80};
+
+        rect[6]={890,260,120,80};
+        rect[7]={1010,260,120,80};
+        rect[8]={1130,260,120,80};
+        viewport();
+        
 
 
 
@@ -548,7 +576,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if (checkms(msx,msy,160,90,1120,630)){
                         newb.x=((msx-320)/1120)*1280;
                         newb.y=((msy-180)/630)*720;
+                        mode=13;
                     }
+
                     break;}
                     
                     
