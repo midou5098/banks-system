@@ -672,7 +672,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;}
                 case 13:
                     if (checkms(msx,msy,440,475,400,400)){
-                        if(db.add(newb)==1){
+                        if(db.add(newb)!=1){
                             mes="bank addded";
                         }else{
                             mes="u fucked up twin";
