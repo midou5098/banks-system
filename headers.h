@@ -15,6 +15,10 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <tinyfiledialogs.h> // tinyfiledialogs was interrupting the sdl while i get the file which caused crashes and freezes sos i switched to nfd
+#include <nfd/nfd.h>
+
+
 class bank{
     public:
         std::string name;
@@ -42,21 +46,48 @@ class database{
     private:
         sqlite3* db;
     public:
-    int opening(int choice);
+    int opening(void);
     bool search(std::string name); 
     bool remove(bank nb);
     int modify(bank nb);
     int add(bank nb);
 };
 
+int database::opening(void){
+        
+    
 
+    nfdu8char_t *outPath;
+    nfdu8filteritem_t filters[2] = { { "Source code", "c,cpp,cc" }, { "Headers", "h,hpp" } };
+    nfdopendialogu8args_t args;
+    args.filterList   = filters;
+    args.filterCount  = 1;
+    args.defaultPath  = nullptr;
+    args.parentWindow = {0};
+    args.filterList = filters;
+    args.filterCount = 2;
+    nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
+    if (result == NFD_OKAY)
+    {
+        puts("Success!");
+        puts(outPath);
+        NFD_FreePathU8(outPath);
+    }
+    if(sqlite3_open(outPath,&db)!=SQLITE_OK) return 1; 
+        int res = sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", nullptr, nullptr, nullptr);
+        if (res!=SQLITE_OK){
+            sqlite3_close(db);
+            db = nullptr;
+            return 1;
+        }
+        return 0;}
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
             sql = "INSERT INTO banks (name, type, manager, interest, funds, clients, x, y) VALUES (? , ?, ? , ?, ?, ?, ?, ?);";
             sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
             sqlite3_bind_text(stmt,1,nb.name.c_str(),-1,SQLITE_STATIC);
-            sqlite3_bind_int(stmt, 2, nb.y);
+            sqlite3_bind_int(stmt, 2, nb.type);
             sqlite3_bind_int(stmt, 3, nb.manager);
             sqlite3_bind_int(stmt, 4, nb.inter);
             sqlite3_bind_int(stmt, 5, nb.funds);
@@ -106,6 +137,7 @@ void SDLinit::line(int x1,int y1,int x2,int y2){
 SDLinit::SDLinit(int w,int h){
     SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO);
     TTF_Init();
+    NFD_Init();
     IMG_Init(IMG_INIT_PNG);
     window=SDL_CreateWindow("fuckass bank",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,w,h,SDL_WINDOW_SHOWN);
     renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
@@ -115,6 +147,7 @@ SDLinit::~SDLinit(void){
     IMG_Quit();
     TTF_Quit();
     SDL_Quit();
+    NFD_Quit();
 }
 void SDLinit::clear(void){
     SDL_SetRenderDrawColor(renderer,128, 54, 7,255);
@@ -402,6 +435,9 @@ void uinter::layout(int* mode){
         
     }else if (*mode==2){
         sdl.drawtext(500,300,"viewing bank");
+        if(!mes.empty()){
+            sdl.drawtext(300,690,mes.c_str());
+        }
     }else if(*mode==12){
         rect[0]={160,90,320,180};
         rect[1]={480,90,320,180};
@@ -500,6 +536,8 @@ void uinter::layout(int* mode){
 
 
         draw(nbutton,440,475,400,400);
+    }else if(*mode==-2){
+        sdl.drawtext(400,200,"press f to import a db ! ");
     }
 }
 void uinter::handle(SDL_Event& event,int &mode){
@@ -526,6 +564,15 @@ void uinter::handle(SDL_Event& event,int &mode){
                             else if(focus==2 && s3.length()<10) s3+=c;
                             else if(focus==3 && s3.length()<10) s4+=c;}
                             
+                }
+                break;
+            case -2:
+                if(key==SDLK_f){
+                    if(db.opening()==1){
+                    mode=-1;
+                }else{
+                    mes="wrong db mf...";
+                }
                 }
                 break;
             case -1:
@@ -626,6 +673,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if (checkms(msx,msy,440,475,400,400)){
                         mode=-1;
                     }
+                    break;
+
+                
                     
 
 
