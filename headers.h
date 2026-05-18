@@ -27,7 +27,7 @@ class bank{
         int manager;
         int clients;
         int funds;
-        int x,y;
+        double x,y;
 
 };
 class clients{
@@ -89,9 +89,10 @@ int database::add(bank nb){
             sqlite3_bind_int(stmt, 4, nb.funds);
             sqlite3_bind_int(stmt, 5, nb.clients);
             sqlite3_bind_int(stmt, 6, nb.manager);
-            sqlite3_bind_int(stmt, 7, nb.x);
-            sqlite3_bind_int(stmt, 8, nb.y);
+            sqlite3_bind_double(stmt, 7, nb.x);
+            sqlite3_bind_double(stmt, 8, nb.y);
             if(sqlite3_step(stmt)!=SQLITE_DONE){
+                std::cout << "SQL error: " << sqlite3_errmsg(db) << std::endl;
                 return -1;
             }return (int)sqlite3_last_insert_rowid(db);
 
@@ -178,7 +179,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=1,focus=-1,res=1,nx,ny;
+        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny;
         Uint32 current_time,lframe_time=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -662,8 +663,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;
                 case 12:{
                     if (checkms(msx,msy,160,90,1120,630)){
-                        newb.x=((msx-320)/1120)*1280;
-                        newb.y=((msy-180)/630)*720;
+                        newb.x=((msx-320.0)/1120.0)*1280;
+                        newb.y=((msy-180.0)/630.0)*720;
+                        std::cout<<newb.x<<newb.y;
                         mode=13;
                     }
 
