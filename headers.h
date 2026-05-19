@@ -180,7 +180,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740;
+        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0;
         Uint32 current_time,lframe_time=0,timer,ltimer=0;;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -216,9 +216,12 @@ void uinter::viewport(void){
 }
 
 void uinter::window(void){
-    if(popped==false){
+    if(popped==true){
         animatepop();
-        popped=true;
+        
+    }
+    if(wy<=-70){
+        popped=false;
     }
 
 }
@@ -230,14 +233,20 @@ void uinter::window(void){
 
 
 void uinter::animatepop(void){
-    SDL_Rect windr={50,wy,1180,620};
+    SDL_Rect windr={-110,wy,1500,1000};
     
     timer=SDL_GetTicks();
-    if(timer>ltimer+100 && wy-10>=50){
-        wy-=50;
+    if(timer>ltimer+4 && wy-20>=-70){
+        wy-=10;
         ltimer=timer;
+        if(no+2<230){
+            no+=2;
+        }
     }
+    
+    
     SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
+    
 
 }
 
@@ -510,8 +519,14 @@ void uinter::layout(int* mode){
         SDL_RenderCopy(renderer,sbu,NULL,&rec2);
         SDL_RenderCopy(renderer,dbu,NULL,&rec3);
         SDL_RenderCopy(renderer,lb,NULL,&rec4);
+        
         SDL_RenderCopy(renderer,nb,NULL,&rec5);
-        animatepop();
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer,0,0,0,no);
+        SDL_Rect fsr={0,0,1280,720};
+        SDL_RenderFillRect(renderer,&fsr);
+        window();
+        
         
 
         
@@ -748,7 +763,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(checkms(msx,msy,990,-105,350,300)){
                         mode=1;
                     }else if(checkms(msx,msy,760,-105,350,300)){
-                        popped=false;
+                        popped=true;
                     }else if(checkms(msx,msy,530,-105,350,300)){
                         mode=21;
                     }else if(checkms(msx,msy,300,-105,350,300)){
