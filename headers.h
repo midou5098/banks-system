@@ -216,8 +216,10 @@ void uinter::viewport(void){
 }
 
 void uinter::window(void){
+    if(popped==false){
         animatepop();
-
+        popped=true;
+    }
 
 }
 
@@ -228,9 +230,13 @@ void uinter::window(void){
 
 
 void uinter::animatepop(void){
-    SDL_Rect windr={50,50,1180,620};
+    SDL_Rect windr={50,wy,1180,620};
     
-    
+    timer=SDL_GetTicks();
+    if(timer>ltimer+100 && wy-10>=50){
+        wy-=50;
+        ltimer=timer;
+    }
     SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
 
 }
@@ -505,7 +511,7 @@ void uinter::layout(int* mode){
         SDL_RenderCopy(renderer,dbu,NULL,&rec3);
         SDL_RenderCopy(renderer,lb,NULL,&rec4);
         SDL_RenderCopy(renderer,nb,NULL,&rec5);
-        
+        animatepop();
         
 
         
@@ -742,7 +748,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(checkms(msx,msy,990,-105,350,300)){
                         mode=1;
                     }else if(checkms(msx,msy,760,-105,350,300)){
-                        window();
+                        popped=false;
                     }else if(checkms(msx,msy,530,-105,350,300)){
                         mode=21;
                     }else if(checkms(msx,msy,300,-105,350,300)){
