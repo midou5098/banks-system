@@ -126,6 +126,7 @@ class SDLinit{
         void drawtext(int x,int y,const std::string &text);
         SDL_Renderer* getrender(void){return renderer;}
         void drawtextarea(int x,int y,int w,int h);
+        void animatepop();
 
 };
 void SDLinit::line(int x1,int y1,int x2,int y2){
@@ -179,15 +180,15 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny;
-        Uint32 current_time,lframe_time=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb;
+        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740;
+        Uint32 current_time,lframe_time=0,timer,ltimer=0;;
+        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
         SDL_Rect rect[9];
         bank newb;
-        bool isdrg=false,fs=false;
+        bool isdrg=false,fs=false,popped=false;
 
     public:
         
@@ -198,6 +199,8 @@ class uinter{
         void viewport(void);
         void draw(SDL_Texture* tex, int x,int y ,int w,int h);
         bool checkms(int msx,int msy,int x,int y,int w,int h);
+        void window(void);
+        void animatepop(void);
         
         void shuffle(void){j=rand()%5;};
         uinter(SDLinit& sdlo,database& dbo);
@@ -211,6 +214,48 @@ void uinter::viewport(void){
     }
  
 }
+
+void uinter::window(void){
+        animatepop();
+
+
+}
+
+
+
+
+
+
+
+void uinter::animatepop(void){
+    SDL_Rect windr={50,50,1180,620};
+    
+    
+    SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     shuffle();
     SDL_Renderer* renderer=sdl.getrender();
@@ -230,6 +275,9 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* dbs=IMG_Load("assets/buttons/delbnk.png");
     SDL_Surface* ns=IMG_Load("assets/buttons/news.png");
     SDL_Surface* lbs=IMG_Load("assets/buttons/lockbnk.png");
+    SDL_Surface* loa=IMG_Load("assets/buttons/load.png");
+    SDL_Surface* win=IMG_Load("assets/ui/window.png");
+    
     
 
     SDL_Surface* maps1=IMG_Load("assets/map/maptl.png");
@@ -279,6 +327,8 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     dbu=SDL_CreateTextureFromSurface(renderer,dbs);
     lb=SDL_CreateTextureFromSurface(renderer,lbs);
     nb=SDL_CreateTextureFromSurface(renderer,ns);
+    load=SDL_CreateTextureFromSurface(renderer,loa);
+    wind=SDL_CreateTextureFromSurface(renderer,win);
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -308,6 +358,8 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(dbs);
     SDL_FreeSurface(lbs);
     SDL_FreeSurface(ns);
+    SDL_FreeSurface(win);
+    SDL_FreeSurface(loa);
     
 
 }
@@ -690,7 +742,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(checkms(msx,msy,990,-105,350,300)){
                         mode=1;
                     }else if(checkms(msx,msy,760,-105,350,300)){
-                        mode=20;
+                        window();
                     }else if(checkms(msx,msy,530,-105,350,300)){
                         mode=21;
                     }else if(checkms(msx,msy,300,-105,350,300)){
@@ -698,6 +750,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }else if(checkms(msx,msy,-25,560,200,200)){
                         mode=23;
                     }
+
                     break;
                 case 12:{
                     if (checkms(msx,msy,160,90,1120,630)){
