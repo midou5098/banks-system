@@ -47,7 +47,7 @@ class database{
         sqlite3* db;
     public:
     int opening(void);
-    bool search(std::string name); 
+    bank search(std::string name);
     bool remove(bank nb);
     int modify(bank nb);
     int add(bank nb);
@@ -97,6 +97,10 @@ int database::add(bank nb){
                 return -1;
             }
     return true;
+}
+
+bank database::search(std::string name){
+
 }
 
 
