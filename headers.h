@@ -225,10 +225,10 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* soms=IMG_Load("assets/somalian.png");
     SDL_Surface* kirks=IMG_Load("assets/kirk.png");
     SDL_Surface* stars=IMG_Load("assets/star.png");
-    SDL_Surface* abs=IMG_Load("assets/buttons/adbnk.png");
+    SDL_Surface* abs=IMG_Load("assets/buttons/addbnk.png");
     SDL_Surface* sbs=IMG_Load("assets/buttons/searchbnk.png");
     SDL_Surface* dbs=IMG_Load("assets/buttons/delbnk.png");
-    SDL_Surface* ns=IMG_Load("assets/buttons/newsbnk.png");
+    SDL_Surface* ns=IMG_Load("assets/buttons/news.png");
     SDL_Surface* lbs=IMG_Load("assets/buttons/lockbnk.png");
     
 
@@ -274,7 +274,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     somal=SDL_CreateTextureFromSurface(renderer,soms);
     kirk=SDL_CreateTextureFromSurface(renderer,kirks);
     star=SDL_CreateTextureFromSurface(renderer,stars);
-    ab=SDL_CreateTextureFromSurface(renderer,ads);
+    ab=SDL_CreateTextureFromSurface(renderer,abs);
     sbu=SDL_CreateTextureFromSurface(renderer,sbs);
     dbu=SDL_CreateTextureFromSurface(renderer,dbs);
     lb=SDL_CreateTextureFromSurface(renderer,lbs);
@@ -442,11 +442,11 @@ void uinter::layout(int* mode){
             rect[8]={852,480,428,240};
             viewport();
         }
-        SDL_Rect rec1={1180,75,600,450};
-        SDL_Rect rec2={1060,75,600,450};
-        SDL_Rect rec3={940,75,600,450};
-        SDL_Rect rec4={820,75,600,450};
-        SDL_Rect rec5={300,25,600,450};
+        SDL_Rect rec1={990,-105,350,300};
+        SDL_Rect rec2={760,-105,350,300};
+        SDL_Rect rec3={530,-105,350,300};
+        SDL_Rect rec4={300,-105,350,300};
+        SDL_Rect rec5={-25,560,200,200};
         SDL_Renderer* renderer=sdl.getrender();
         SDL_RenderCopy(renderer,ab,NULL,&rec1);
         SDL_RenderCopy(renderer,sbu,NULL,&rec2);
@@ -685,6 +685,18 @@ void uinter::handle(SDL_Event& event,int &mode){
                         dragsy=event.button.y;
                         lsx=event.button.x;
                         lsy=event.button.y;
+                    }
+                    //thhe new pages : 20 search bank , 21 delete bank,22 lock bank(the boss) , 23 news, nah hold on , why overcomplicate it and add separate layouts ? i ll add a floating window for the search and the delete and the news ,and only add a layout for lock
+                    if(checkms(msx,msy,990,-105,350,300)){
+                        mode=1;
+                    }else if(checkms(msx,msy,760,-105,350,300)){
+                        mode=20;
+                    }else if(checkms(msx,msy,530,-105,350,300)){
+                        mode=21;
+                    }else if(checkms(msx,msy,300,-105,350,300)){
+                        mode=22;
+                    }else if(checkms(msx,msy,-25,560,200,200)){
+                        mode=23;
                     }
                     break;
                 case 12:{
