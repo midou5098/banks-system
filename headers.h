@@ -184,7 +184,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0;
+        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1;
         Uint32 current_time,lframe_time=0,timer,ltimer=0;;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -192,7 +192,7 @@ class uinter{
         SDL_Texture* mapst[9];
         SDL_Rect rect[9];
         bank newb;
-        bool isdrg=false,fs=false,popped=false;
+        bool isdrg=false,fs=false,popped=false,down=false,up=true;
 
     public:
         
@@ -221,10 +221,9 @@ void uinter::viewport(void){
 
 void uinter::window(void){
     if(popped==true){
-        animatepop();
-        
+            animatepop();
     }
-    if(wy<=-70){
+    if(wy<=-70 || wy>750){
         popped=false;
     }
 
@@ -240,13 +239,22 @@ void uinter::animatepop(void){
     SDL_Rect windr={-110,wy,1500,1000};
     
     timer=SDL_GetTicks();
-    if(timer>ltimer+4 && wy-20>=-70){
-        wy-=10;
-        ltimer=timer;
-        if(no+2<230){
-            no+=2;
+    if(timer>ltimer+4 && wy-20>=-70 && wy+20<=740){
+        if(up==true){
+            wy-=10;
+            ltimer=timer;
+            if(no+2<230){
+                no+=2;
+            }
+        }else{
+            wy+=10;
+            ltimer=timer;
+            if(no-2>0){
+                no-=2;
+            }
         }
     }
+
     
     
     SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
@@ -681,6 +689,13 @@ void uinter::handle(SDL_Event& event,int &mode){
                     fs=!fs;
                 }else if (key==SDLK_a){
                     mode=1;
+                }else if(key==SDLK_ESCAPE){
+                    if(state==1){
+                        popped=true;
+                        down=true;
+                        
+                        
+                    }
                 }
                 if(fs==false){
                     if(key==SDLK_RIGHT){
@@ -767,7 +782,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(checkms(msx,msy,990,-105,350,300)){
                         mode=1;
                     }else if(checkms(msx,msy,760,-105,350,300)){
-                        popped=true;
+                        if (state==-1){
+                            popped=true;
+                            up=true;
+                        }
                     }else if(checkms(msx,msy,530,-105,350,300)){
                         mode=21;
                     }else if(checkms(msx,msy,300,-105,350,300)){
