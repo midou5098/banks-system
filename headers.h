@@ -126,13 +126,29 @@ class SDLinit{
         void clear();
         void present();
         void line(int x1,int y1,int x2,int y2);
-        void drawbut(int x,int y,int w,int h,int r,int g,int b,const int type);
+        void drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text);
         void drawtext(int x,int y,const std::string &text);
         SDL_Renderer* getrender(void){return renderer;}
         void drawtextarea(int x,int y,int w,int h);
         void animatepop();
 
 };
+void SDLinit::drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text){
+    
+    SDL_SetRenderDrawColor(renderer,r,g,b,255);
+    SDL_Rect rect6={x,y,w,h};
+    SDL_RenderFillRect(renderer,&rect6);
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderDrawRect(renderer,&rect6);
+    SDL_Color white = {120,120,120,255};
+    SDL_Surface* surf=TTF_RenderText_Solid(font1,text.c_str(),white);
+    SDL_Texture* tex=SDL_CreateTextureFromSurface(renderer,surf);
+    SDL_Rect rect5={x+27,y+10,w-50,h-30};
+    SDL_RenderCopy(renderer,tex,NULL,&rect5);
+    SDL_FreeSurface(surf);
+    SDL_DestroyTexture(tex);
+    
+}
 void SDLinit::line(int x1,int y1,int x2,int y2){
 
     SDL_RenderDrawLine(renderer,x1,y1,x2,y2);
@@ -185,14 +201,14 @@ class uinter{
         SDLinit& sdl;
         database& db;
         int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1;
-        Uint32 current_time,lframe_time=0,timer,ltimer=0;;
+        Uint32 current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
         SDL_Rect rect[9],windr;
         bank newb;
-        bool isdrg=false,fs=false,popped=false,down=false,up=true;
+        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false;
 
     public:
         
@@ -309,7 +325,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* dbs=IMG_Load("assets/buttons/delbnk.png");
     SDL_Surface* ns=IMG_Load("assets/buttons/news.png");
     SDL_Surface* lbs=IMG_Load("assets/buttons/lockbnk.png");
-    SDL_Surface* loa=IMG_Load("assets/buttons/load.png");
+    SDL_Surface* loa=IMG_Load("assets/ui/load.png");
     SDL_Surface* win=IMG_Load("assets/ui/window.png");
     
     
@@ -546,6 +562,26 @@ void uinter::layout(int* mode){
         SDL_RenderFillRect(renderer,&fsr);
         window();
         SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
+        
+        
+            
+            if(state==1 && up==false && down==false){
+                if(SDL_GetTicks()-lt<3000){
+                    onboard=false;
+                    sdl.drawtext(540,240,"give us a moment >_<");
+                    animate(load,570,300,140,140,-1);
+
+                }else{
+                    onboard=true;
+                    sdl.drawtext(500,200,"enter the banks name: ");
+                    sdl.drawtextarea(725,190,150,30);
+                    if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
+                    sdl.drawbut(900,190,100,30,40,10,80,"search");
+
+                }
+    }
+        
+        
         //SDL_Rect test={0,570,170,150};
         //SDL_SetRenderDrawColor(renderer,0,0,0,255);
         //SDL_RenderFillRect(renderer,&test);
@@ -696,6 +732,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                 }
                 break;
             case -1:
+            if(onboard==true && focus==1){
+                if (key>=32 && key<=126) {  
+                            char c=(char)key;
+                            if (s1.length()<14){s1+=c;}}
+            }
                 if(key==SDLK_f){
                     fs=!fs;
                 }else if (key==SDLK_a){
@@ -783,6 +824,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }
                     break;
                 case -1:
+                    if(onboard==true){
+                        if(checkms(msx,msy,725,200,150,30)){
+                            focus=1;
+                        }
+                    }
                     if (fs==false){
                         isdrg=true;
                         dragsx=event.button.x;
@@ -794,6 +840,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(checkms(msx,msy,1060,0,350,60)){
                         mode=1;
                     }else if(checkms(msx,msy,830,0,210,60)){
+                        lt=SDL_GetTicks();
                         if (state==-1){
                             popped=true;
                             up=true;
@@ -801,11 +848,21 @@ void uinter::handle(SDL_Event& event,int &mode){
                             state=1;
                         }
                     }else if(checkms(msx,msy,600,0,210,60)){
-                        mode=21;
+                        if (state==-1){
+                            popped=true;
+                            up=true;
+                            down=false;
+                            state=1;
+                        }
                     }else if(checkms(msx,msy,370,0,210,60)){
                         mode=22;
                     }else if(checkms(msx,msy,0,570,170,150)){
-                        mode=23;
+                        if (state==-1){
+                            popped=true;
+                            up=true;
+                            down=false;
+                            state=1;
+                        }
                     }
 
                     break;
