@@ -190,7 +190,7 @@ class uinter{
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
-        SDL_Rect rect[9];
+        SDL_Rect rect[9],windr;
         bank newb;
         bool isdrg=false,fs=false,popped=false,down=false,up=true;
 
@@ -223,8 +223,15 @@ void uinter::window(void){
     if(popped==true){
             animatepop();
     }
-    if(wy<=-70 || wy>750){
+    if(wy<=-70){
         popped=false;
+        up=false;
+    }else if (wy>=760){
+        popped=false;
+        wy=740;
+        state=-1;
+        up=false;
+        down=false;
     }
 
 }
@@ -236,17 +243,17 @@ void uinter::window(void){
 
 
 void uinter::animatepop(void){
-    SDL_Rect windr={-110,wy,1500,1000};
+    windr={-110,wy,1500,1000};
     
     timer=SDL_GetTicks();
-    if(timer>ltimer+4 && wy-20>=-70 && wy+20<=740){
-        if(up==true){
+    if(timer>ltimer+4  ){
+        if(up==true && wy>-70){
             wy-=10;
             ltimer=timer;
             if(no+2<230){
                 no+=2;
             }
-        }else{
+        }else if (down==true && wy<760){
             wy+=10;
             ltimer=timer;
             if(no-2>0){
@@ -257,7 +264,7 @@ void uinter::animatepop(void){
 
     
     
-    SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
+    
     
 
 }
@@ -538,6 +545,10 @@ void uinter::layout(int* mode){
         SDL_Rect fsr={0,0,1280,720};
         SDL_RenderFillRect(renderer,&fsr);
         window();
+        SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
+        //SDL_Rect test={0,570,170,150};
+        //SDL_SetRenderDrawColor(renderer,0,0,0,255);
+        //SDL_RenderFillRect(renderer,&test);
         
         
 
@@ -690,9 +701,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                 }else if (key==SDLK_a){
                     mode=1;
                 }else if(key==SDLK_ESCAPE){
-                    if(state==1){
+                    if(state==1 && !down){
                         popped=true;
                         down=true;
+                        up=false;
                         
                         
                     }
@@ -779,18 +791,20 @@ void uinter::handle(SDL_Event& event,int &mode){
                         lsy=event.button.y;
                     }
                     //thhe new pages : 20 search bank , 21 delete bank,22 lock bank(the boss) , 23 news, nah hold on , why overcomplicate it and add separate layouts ? i ll add a floating window for the search and the delete and the news ,and only add a layout for lock
-                    if(checkms(msx,msy,990,-105,350,300)){
+                    if(checkms(msx,msy,1060,0,350,60)){
                         mode=1;
-                    }else if(checkms(msx,msy,760,-105,350,300)){
+                    }else if(checkms(msx,msy,830,0,210,60)){
                         if (state==-1){
                             popped=true;
                             up=true;
+                            down=false;
+                            state=1;
                         }
-                    }else if(checkms(msx,msy,530,-105,350,300)){
+                    }else if(checkms(msx,msy,600,0,210,60)){
                         mode=21;
-                    }else if(checkms(msx,msy,300,-105,350,300)){
+                    }else if(checkms(msx,msy,370,0,210,60)){
                         mode=22;
-                    }else if(checkms(msx,msy,-25,560,200,200)){
+                    }else if(checkms(msx,msy,0,570,170,150)){
                         mode=23;
                     }
 
