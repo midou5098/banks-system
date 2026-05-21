@@ -136,17 +136,17 @@ class SDLinit{
 void SDLinit::drawbut(int x,int y,int w,int h,int r,int g,int b,const std::string &text){
     
     SDL_SetRenderDrawColor(renderer,r,g,b,255);
-    SDL_Rect rect6={x,y,w,h};
-    SDL_RenderFillRect(renderer,&rect6);
+    SDL_Rect rect61={x,y,w,h};
+    SDL_RenderFillRect(renderer,&rect61);
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
-    SDL_RenderDrawRect(renderer,&rect6);
-    SDL_Color white = {120,120,120,255};
-    SDL_Surface* surf=TTF_RenderText_Solid(font1,text.c_str(),white);
-    SDL_Texture* tex=SDL_CreateTextureFromSurface(renderer,surf);
-    SDL_Rect rect5={x+27,y+10,w-50,h-30};
-    SDL_RenderCopy(renderer,tex,NULL,&rect5);
-    SDL_FreeSurface(surf);
-    SDL_DestroyTexture(tex);
+    SDL_RenderDrawRect(renderer,&rect61);
+    SDL_Color white = {0,0,0,255};
+    SDL_Surface* surfy=TTF_RenderText_Solid(font1,text.c_str(),white);
+    SDL_Texture* texy=SDL_CreateTextureFromSurface(renderer,surfy);
+    SDL_Rect rect51={x+17,y+2,w-30,h};
+    SDL_RenderCopy(renderer,texy,NULL,&rect51);
+    SDL_FreeSurface(surfy);
+    SDL_DestroyTexture(texy);
     
 }
 void SDLinit::line(int x1,int y1,int x2,int y2){
@@ -207,8 +207,8 @@ class uinter{
         std::string name,inter,s1,s2,s3,s4,mes;
         SDL_Texture* mapst[9];
         SDL_Rect rect[9],windr;
-        bank newb;
-        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false;
+        bank newb,srb;
+        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true;
 
     public:
         
@@ -576,8 +576,16 @@ void uinter::layout(int* mode){
                     sdl.drawtext(500,200,"enter the banks name: ");
                     sdl.drawtextarea(725,190,150,30);
                     if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
-                    sdl.drawbut(900,190,100,30,40,10,80,"search");
-
+                    sdl.drawbut(900,190,100,30,180,150,240,"search");
+                    if(found==true){
+                        sdl.drawtext(100,350,"bank name : temp");
+                        sdl.drawtext(100,400,"interest : temp");
+                        sdl.drawtext(100,450,"clients : temp");
+                        sdl.drawtext(100,500,"funds : ");
+                        sdl.drawtext(100,550,"manager : temp");
+                        sdl.drawtext(100,600,"type : temp");
+                    }
+                    
                 }
     }
         
@@ -824,6 +832,13 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }
                     break;
                 case -1:
+                    if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
+                        srb=db.search(s1);
+                        if(srb.name=="69notfound67"){
+                            found=false;
+
+                        }else{found=true;}
+                    }
                     if(onboard==true){
                         if(checkms(msx,msy,725,200,150,30)){
                             focus=1;
