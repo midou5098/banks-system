@@ -14,6 +14,8 @@ def state(hands_landmark):
     opne=hands_landmark.landmark[4].x>hands_landmark.landmark[3].x
     if fingered>=3 and opne:
         return 1
+    elif fingered==3 and hands_landmark.landmark[4].x>hands_landmark.landmark[2].x:
+        return 2
     else:
         return 0
 

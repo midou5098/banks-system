@@ -748,10 +748,6 @@ void uinter::layout(int* mode){
         rect[7]={1010,260,120,80};
         rect[8]={1130,260,120,80};
         viewport();
-        s1="niggs.co";
-        s2="20";
-        s3="30";
-        s4="545";
         sdl.drawtext(120,385,"name :         "+s1);
         sdl.drawtext(50,420,"interest rate :         "+s2+"%");
         sdl.drawtext(120,455,"funds :        "+s3+"billions");
