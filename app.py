@@ -24,7 +24,7 @@ hands=mp_hnds.Hands()
 cap=cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
-
+timep=time.time()
 
 if not cap :
     print("couldnt open the camera twin")
@@ -33,6 +33,7 @@ last_state = -1
 last_write_time = 0
 WRITE_INTERVAL = 0.1
 while True:
+    timeps=time.time()
     current_time = time.time()
     ret,frame=cap.read()
     rgb=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
@@ -41,7 +42,7 @@ while True:
         
    
     
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q') or timeps-timep>10:
         break
     if result.multi_hand_landmarks is not None:
         for hands_landmark in result.multi_hand_landmarks:
