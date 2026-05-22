@@ -109,11 +109,11 @@ bool database::search(std::string name,bool& found,bank& banki){
         std::cout <<"found";
         found=true;
         banki.name=reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)),
-        banki.type=sqlite3_column_int(stmt, 0),
-        banki.inter=sqlite3_column_int(stmt, 1),
-        banki.funds=sqlite3_column_int(stmt, 2),
-        banki.clients=sqlite3_column_int(stmt, 3),
-        banki.manager=sqlite3_column_int(stmt, 4);
+        banki.type=sqlite3_column_int(stmt, 1),
+        banki.inter=sqlite3_column_int(stmt, 2),
+        banki.funds=sqlite3_column_int(stmt, 3),
+        banki.clients=sqlite3_column_int(stmt, 4),
+        banki.manager=sqlite3_column_int(stmt, 5);
         }else{
             std::cout <<"found";
         }sqlite3_finalize(stmt);
@@ -228,10 +228,10 @@ class uinter{
         Uint32 current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
-        std::string name,inter,s1,s2,s3,s4,mes;
-        SDL_Texture* mapst[9];
+        std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="";
+        SDL_Texture* mapst[9],*temptex,*managfra;
         SDL_Rect rect[9],windr;
-        bank newb,srb;
+        bank newb,newbb,srb;
         bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true;
 
     public:
@@ -351,6 +351,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* lbs=IMG_Load("assets/buttons/lockbnk.png");
     SDL_Surface* loa=IMG_Load("assets/ui/load.png");
     SDL_Surface* win=IMG_Load("assets/ui/window.png");
+    SDL_Surface* fras=IMG_Load("assets/ui/managerfra.png");
     
     
 
@@ -403,6 +404,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     nb=SDL_CreateTextureFromSurface(renderer,ns);
     load=SDL_CreateTextureFromSurface(renderer,loa);
     wind=SDL_CreateTextureFromSurface(renderer,win);
+    managfra=SDL_CreateTextureFromSurface(renderer,fras);
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -434,6 +436,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(ns);
     SDL_FreeSurface(win);
     SDL_FreeSurface(loa);
+    SDL_FreeSurface(fras);
     
 
 }
@@ -603,31 +606,49 @@ void uinter::layout(int* mode){
                     sdl.drawbut(900,190,100,30,180,150,240,"search");
                     if(bmode==0){
                         if(found==true){
-                        sdl.drawtext(100,350,"bank name : "+newb.name);
-                        sdl.drawtext(100,400,"interest : "+std::to_string(newb.inter));
-                        sdl.drawtext(100,450,"clients : "+std::to_string(newb.clients));
-                        sdl.drawtext(100,500,"funds : "+std::to_string(newb.funds));
+                        sdl.drawtext(100,350,"bank name : "+newbb.name);
+                        sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
+                        sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
+                        sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
                         std::string tempn;
-                        switch(newb.manager){
+                        switch(newbb.manager){
                             case 0:
                                 tempn="jew";
+                                temptex=jew; 
                                 break;
                             case 1:
                                 tempn="kirk";
+                                temptex=kirk; 
                                 break;
                             case 2:
                                 tempn="adolf";
+                                temptex=adolf; 
                                 break;
                             case 3:
                                 tempn="captain";
+                                temptex=somal; 
                                 break;
                         }
-                        sdl.drawtext(100,500,"funds : "+tempn);
-                        
-                        sdl.drawtext(100,600,"type : temp");
+                        SDL_Rect fr={950,430,350,300};
+                        SDL_Rect mn={1055,502,150,150};
+                        SDL_RenderCopy(renderer,managfra,NULL,&fr);
+                        SDL_RenderCopy(renderer,temptex,NULL,&mn);
+                        sdl.drawtext(100,550,"manager : "+tempn);
+                        switch(newbb.type){
+                            case 0:
+                                tempn2="modern bank";
+                                break;
+                            case 1:
+                                tempn2="country bank";
+                                break;
+                            case 2:
+                                tempn2="billionaires bank";
+                                break;
+                        }
+                        sdl.drawtext(100,600,"type : "+tempn2);
                          }
                     }else{
-                        sdl.drawtext(100,350,"deleting ");
+                        sdl.drawtext(100,350,"not found twin");
 
                     }
                     
@@ -754,21 +775,25 @@ void uinter::handle(SDL_Event& event,int &mode){
         SDL_Keycode key=event.key.keysym.sym;
         switch(mode){
             case 1:
-                if (key==SDLK_a){
-                mode=1;
-                shuffle();
-                }else if(key==SDLK_v){
-                    mode=2;
-                    shuffle();
-                }else if(key==SDLK_m){
-                    mode=-1;
-                    shuffle();
-                }
                 if(focus!=-1){
+                    if(key==SDLK_BACKSPACE){
+                        switch(focus){
+                            case 0:
+                                s1.pop_back();
+                                break;
+                            case 1:
+                                s2.pop_back();
+                                break;
+                            case 2:
+                                s3.pop_back();
+                                break;
+                            case 3:
+                                s4.pop_back();
+                        }
+                    }
                     if (key>=32 && key<=126) {  
                             char c=(char)key;
                             if(focus==0 && s1.length()<20) s1+=c;
-
                             else if(focus==1 && s2.length()<20) s2+=c;
                             else if(focus==2 && s3.length()<10) s3+=c;
                             else if(focus==3 && s3.length()<10) s4+=c;}
@@ -786,14 +811,15 @@ void uinter::handle(SDL_Event& event,int &mode){
                 break;
             case -1:
             if(onboard==true && focus==1){
+                if(key==SDLK_BACKSPACE && !s1.empty()){
+                    s1.pop_back();
+                }
                 if (key>=32 && key<=126) {  
                             char c=(char)key;
                             if (s1.length()<14){s1+=c;}}
             }
                 if(key==SDLK_f){
                     fs=!fs;
-                }else if (key==SDLK_a){
-                    mode=1;
                 }else if(key==SDLK_ESCAPE){
                     if(state==1 && !down){
                         popped=true;
@@ -880,7 +906,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;
                 case -1:
                     if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
-                        db.search(s1.c_str(),found,newb);}
+                        db.search(s1.c_str(),found,newbb);}
                     if(onboard==true){
                         if(checkms(msx,msy,725,200,150,30)){
                             focus=1;
@@ -944,6 +970,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                         }else{
                             mes="u fucked up twin";
                         }
+                        s1="";
+                        s2="";
+                        s3="";
+                        s4="";
                         mode=-1;
                     }
                     break;
