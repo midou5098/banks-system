@@ -14,7 +14,7 @@ def state(hands_landmark):
     opne=hands_landmark.landmark[4].x>hands_landmark.landmark[3].x
     if fingered>=3 and opne:
         return 1
-    elif fingered==3 and hands_landmark.landmark[4].x>hands_landmark.landmark[2].x:
+    elif hands_landmark.landmark[4].x<hands_landmark.landmark[3].x and hands_landmark.landmark[8].y < hands_landmark.landmark[6].y and hands_landmark.landmark[12].y < hands_landmark.landmark[10].y and hands_landmark.landmark[16].y>hands_landmark.landmark[14].y and hands_landmark.landmark[20].y>hands_landmark.landmark[18].y:
         return 2
     else:
         return 0
@@ -48,14 +48,18 @@ while True:
                 if state(hands_landmark)==0:
                     pito="closed"
 
-                else:
+                elif state(hands_landmark)==1:
                     pito="opened"
+                elif state(hands_landmark)==2:
+                    pito="peace"
                 if pito != last_state or (current_time - last_write_time) > WRITE_INTERVAL:
                     with open("state.txt","w") as file:
                         if pito=="opened":
                             file.write("1")           #finna use 1 for opened and 0 for closed
-                        else:
+                        elif pito=="closed":
                             file.write("0") 
+                        elif pito=="peace":
+                            file.write("2")
                         last_state = pito
                         last_write_time = current_time
                 mp.solutions.drawing_utils.draw_landmarks(frame,hands_landmark,mp_hnds.HAND_CONNECTIONS)
