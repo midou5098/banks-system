@@ -47,7 +47,7 @@ class database{
         sqlite3* db;
     public:
     int opening(void);
-    bank search(std::string name);
+    bool search(std::string name,bool& found,bank& banki);
     bool remove(bank nb);
     int modify(bank nb);
     int add(bank nb);
@@ -99,9 +99,33 @@ int database::add(bank nb){
     return true;
 }
 
-bank database::search(std::string name){
+bool database::search(std::string name,bool& found,bank& banki){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    sql="SELECT * FROM BANKS WHERE name = ? ";
+    sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+    sqlite3_bind_text(stmt,1,name.c_str(),-1,SQLITE_STATIC);
+    if(sqlite3_step(stmt)==SQLITE_ROW){
+        std::cout <<"found";
+        found=true;
+        banki.name=reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)),
+        banki.type=sqlite3_column_int(stmt, 0),
+        banki.inter=sqlite3_column_int(stmt, 1),
+        banki.funds=sqlite3_column_int(stmt, 2),
+        banki.clients=sqlite3_column_int(stmt, 3),
+        banki.manager=sqlite3_column_int(stmt, 4);
+        }else{
+            std::cout <<"found";
+        }sqlite3_finalize(stmt);
+        return true;
 
-}
+
+    }
+
+
+
+
+
 
 
 
@@ -579,11 +603,27 @@ void uinter::layout(int* mode){
                     sdl.drawbut(900,190,100,30,180,150,240,"search");
                     if(bmode==0){
                         if(found==true){
-                        sdl.drawtext(100,350,"bank name : temp");
-                        sdl.drawtext(100,400,"interest : temp");
-                        sdl.drawtext(100,450,"clients : temp");
-                        sdl.drawtext(100,500,"funds : ");
-                        sdl.drawtext(100,550,"manager : temp");
+                        sdl.drawtext(100,350,"bank name : "+newb.name);
+                        sdl.drawtext(100,400,"interest : "+std::to_string(newb.inter));
+                        sdl.drawtext(100,450,"clients : "+std::to_string(newb.clients));
+                        sdl.drawtext(100,500,"funds : "+std::to_string(newb.funds));
+                        std::string tempn;
+                        switch(newb.manager){
+                            case 0:
+                                tempn="jew";
+                                break;
+                            case 1:
+                                tempn="kirk";
+                                break;
+                            case 2:
+                                tempn="adolf";
+                                break;
+                            case 3:
+                                tempn="captain";
+                                break;
+                        }
+                        sdl.drawtext(100,500,"funds : "+tempn);
+                        
                         sdl.drawtext(100,600,"type : temp");
                          }
                     }else{
@@ -840,12 +880,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;
                 case -1:
                     if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
-                        srb=db.search(s1);
-                        if(srb.name=="69notfound67"){
-                            found=false;
-
-                        }else{found=true;}
-                    }
+                        db.search(s1.c_str(),found,newb);}
                     if(onboard==true){
                         if(checkms(msx,msy,725,200,150,30)){
                             focus=1;
