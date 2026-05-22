@@ -18,7 +18,10 @@
 #include <tinyfiledialogs.h> // tinyfiledialogs was interrupting the sdl while i get the file which caused crashes and freezes sos i switched to nfd
 #include <nfd/nfd.h>
 
-
+void recognition(void){
+    std::string comnd="python app.py";
+    system(comnd.c_str());
+}
 class bank{
     public:
         std::string name;
@@ -764,6 +767,8 @@ void uinter::layout(int* mode){
         draw(nbutton,440,475,400,400);
     }else if(*mode==-2){
         sdl.drawtext(400,200,"press f to import a db ! ");
+    }else if (*mode==22){
+        recognition();
     }
 }
 void uinter::handle(SDL_Event& event,int &mode){

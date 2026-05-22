@@ -16,6 +16,7 @@ int main(void){
         uic.layout(&mode);
 
         sdl.present();
+        //std::cout<<mode;
 
         }
         sdl.~SDLinit();
