@@ -774,7 +774,25 @@ void uinter::handle(SDL_Event& event,int &mode){
     if (event.type==SDL_KEYDOWN){
         SDL_Keycode key=event.key.keysym.sym;
         switch(mode){
+            case 11:
+                if(key==SDLK_ESCAPE){
+                    mode=1;
+                }
+                break;
+            case 12:
+                if(key==SDLK_ESCAPE){
+                    mode=11;
+                }
+                break;
+            case 13:
+                if(key==SDLK_ESCAPE){
+                    mode=12;
+                }
+                break;
             case 1:
+                if(key==SDLK_ESCAPE){
+                    mode=-1;
+                }
                 if(focus!=-1){
                     if(key==SDLK_BACKSPACE){
                         switch(focus){
