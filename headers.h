@@ -200,7 +200,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1;
+        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
         Uint32 current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -577,13 +577,18 @@ void uinter::layout(int* mode){
                     sdl.drawtextarea(725,190,150,30);
                     if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
                     sdl.drawbut(900,190,100,30,180,150,240,"search");
-                    if(found==true){
+                    if(bmode==0){
+                        if(found==true){
                         sdl.drawtext(100,350,"bank name : temp");
                         sdl.drawtext(100,400,"interest : temp");
                         sdl.drawtext(100,450,"clients : temp");
                         sdl.drawtext(100,500,"funds : ");
                         sdl.drawtext(100,550,"manager : temp");
                         sdl.drawtext(100,600,"type : temp");
+                         }
+                    }else{
+                        sdl.drawtext(100,350,"deleting ");
+
                     }
                     
                 }
@@ -754,6 +759,8 @@ void uinter::handle(SDL_Event& event,int &mode){
                         popped=true;
                         down=true;
                         up=false;
+                        bmode=-1;
+                        lt=0;
                         
                         
                     }
@@ -857,13 +864,16 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }else if(checkms(msx,msy,830,0,210,60)){
                         lt=SDL_GetTicks();
                         if (state==-1){
+                            bmode=0;
                             popped=true;
                             up=true;
                             down=false;
                             state=1;
                         }
                     }else if(checkms(msx,msy,600,0,210,60)){
+                        lt=SDL_GetTicks();
                         if (state==-1){
+                            bmode=1;
                             popped=true;
                             up=true;
                             down=false;
@@ -872,7 +882,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }else if(checkms(msx,msy,370,0,210,60)){
                         mode=22;
                     }else if(checkms(msx,msy,0,570,170,150)){
+                        lt=SDL_GetTicks();
                         if (state==-1){
+                            bmode=2;
                             popped=true;
                             up=true;
                             down=false;
