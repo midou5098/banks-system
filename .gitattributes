@@ -1,0 +1,12 @@
+# Mask the NFD library files
+libnfd.a linguist-vendored
+nfd.h linguist-vendored
+nfd_sdl2.h linguist-vendored
+
+# Mask tinyfiledialogs
+tinyfiledialogs.c linguist-vendored
+tinyfiledialogs.h linguist-vendored
+
+# Also mask if they're in a folder (recommended for future)
+lib/ linguist-vendored
+external/ linguist-vendored
