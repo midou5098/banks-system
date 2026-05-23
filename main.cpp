@@ -1,6 +1,6 @@
 #include "headers.h"
 int main(void){
-    int mode=-2;
+    int mode=-1;
     SDLinit sdl(1280,720);
     database cap;
     uinter uic(sdl,cap);

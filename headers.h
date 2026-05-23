@@ -12,6 +12,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <math.h>
@@ -19,8 +20,7 @@
 #include <nfd/nfd.h>
 
 void recognition(void){
-    std::string comnd="python app.py";
-    system(comnd.c_str());
+    system("python app.py &");
 }
 class bank{
     public:
@@ -228,14 +228,14 @@ class uinter{
         SDLinit& sdl;
         database& db;
         int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
-        Uint32 current_time,lframe_time=0,timer,ltimer=0,lt=0;
+        Uint32 rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="";
         SDL_Texture* mapst[9],*temptex,*managfra;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
-        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true;
+        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
 
     public:
         
@@ -760,15 +760,35 @@ void uinter::layout(int* mode){
         if (isdrg){
             std::cout<<"dragging";
         }
-
-
-
-
         draw(nbutton,440,475,400,400);
     }else if(*mode==-2){
         sdl.drawtext(400,200,"press f to import a db ! ");
     }else if (*mode==22){
-        recognition();
+        if(SDL_GetTicks()-rt>1000 && rd==false){
+            recognition();
+            rd=true;
+        }
+        std::string sig="";
+        std::ifstream fike("state.txt");
+        std::string line;
+        std::getline(fike,line);
+        sig=line[0];
+        std::string sign;
+        std::cout<<sig;
+        if (sig=="0"){
+            sign="hand closed";
+        }else if(sig=="1"){
+            sign="hand open";
+        }else if (sig=="2"){
+            sign="peace";
+        }else if(sig==""){
+            sign="unknown";
+        }
+        sdl.drawtext(500,300,"your sign is : "+sign);
+
+
+
+        
     }
 }
 void uinter::handle(SDL_Event& event,int &mode){
@@ -961,6 +981,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         }
                     }else if(checkms(msx,msy,370,0,210,60)){
                         mode=22;
+                        rt=SDL_GetTicks();
                     }else if(checkms(msx,msy,0,570,170,150)){
                         lt=SDL_GetTicks();
                         if (state==-1){
