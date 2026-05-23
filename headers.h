@@ -31,6 +31,8 @@ class bank{
         int clients;
         int funds;
         double x,y;
+        bool locked;
+        std::string sign;
 
 };
 class clients{
@@ -84,7 +86,7 @@ int database::opening(void){
 int database::add(bank nb){
     sqlite3_stmt* stmt;
     const char* sql;
-            sql = "INSERT INTO banks (name, type, interest, funds, clients, manager, x, y) VALUES (? , ?, ? , ?, ?, ?, ?, ?);";
+            sql = "INSERT INTO banks (name, type, interest, funds, clients, manager, x, y,lock,sign) VALUES (? , ?, ? , ?, ?, ?, ?, ?,?,?);";
             sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
             sqlite3_bind_text(stmt,1,nb.name.c_str(),-1,SQLITE_STATIC);
             sqlite3_bind_int(stmt, 2, nb.type);
@@ -94,6 +96,13 @@ int database::add(bank nb){
             sqlite3_bind_int(stmt, 6, nb.manager);
             sqlite3_bind_double(stmt, 7, nb.x);
             sqlite3_bind_double(stmt, 8, nb.y);
+            if(nb.locked==true){
+                sqlite3_bind_int(stmt, 9, 1);
+            }else{
+                sqlite3_bind_int(stmt, 9, -1);
+            }
+            sqlite3_bind_text(stmt,10,nb.sign.c_str(),-1,SQLITE_STATIC);
+            
             int result = sqlite3_step(stmt);
             sqlite3_finalize(stmt); 
             if (result != SQLITE_DONE) {
@@ -649,6 +658,11 @@ void uinter::layout(int* mode){
                                 break;
                         }
                         sdl.drawtext(100,600,"type : "+tempn2);
+                        if (newbb.locked==true){
+                            sdl.drawtext(100,600,"locked : yes");
+                        }else{
+                            sdl.drawtext(100,600,"locked no");
+                        }
                          }
                     }else{
                         sdl.drawtext(100,350,"not found twin");
@@ -1005,6 +1019,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;}
                 case 13:
                     if (checkms(msx,msy,440,475,400,400)){
+                        newb.locked=false;
+                        newb.sign="";
+                        
                         if(db.add(newb)!=1){
                             mes="bank addded";
                         }else{
