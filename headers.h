@@ -56,7 +56,30 @@ class database{
     bool remove(bank nb);
     int modify(bank nb);
     int add(bank nb);
+    bool lock(std::string name,std::string sign);
 };
+bool database::lock(std::string name,std::string sign){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    sql="UPDATE banks SET lock = ?, sign = ? WHERE name =?";
+    sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+    std::cout << sqlite3_errmsg(db) << std::endl;
+    sqlite3_bind_int(stmt,1,1);
+    sqlite3_bind_text(stmt,2,sign.c_str(),-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt,3,name.c_str(),-1,SQLITE_STATIC);
+   
+    
+
+    if(sqlite3_step(stmt)!=SQLITE_DONE){
+        sqlite3_finalize(stmt);
+        return false;
+    }else{
+
+        sqlite3_finalize(stmt);
+        return true;
+    }
+    
+}
 
 int database::opening(void){
         
@@ -125,7 +148,12 @@ bool database::search(std::string name,bool& found,bank& banki){
         banki.funds=sqlite3_column_int(stmt, 3),
         banki.clients=sqlite3_column_int(stmt, 4),
         banki.manager=sqlite3_column_int(stmt, 5);
+        if(sqlite3_column_int(stmt, 8)==1){
+            banki.locked=true;
         }else{
+            banki.locked=false;
+        }
+    }else{
             std::cout <<"found";
         }sqlite3_finalize(stmt);
         return true;
@@ -239,8 +267,8 @@ class uinter{
         Uint32 rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
-        std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="";
-        SDL_Texture* mapst[9],*temptex,*managfra;
+        std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
+        SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
         bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
@@ -363,6 +391,8 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* loa=IMG_Load("assets/ui/load.png");
     SDL_Surface* win=IMG_Load("assets/ui/window.png");
     SDL_Surface* fras=IMG_Load("assets/ui/managerfra.png");
+    SDL_Surface* scans=IMG_Load("assets/ui/scan.png");
+    SDL_Surface* lockups=IMG_Load("assets/ui/lock_his_ass_up.png");
     
     
 
@@ -416,6 +446,8 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     load=SDL_CreateTextureFromSurface(renderer,loa);
     wind=SDL_CreateTextureFromSurface(renderer,win);
     managfra=SDL_CreateTextureFromSurface(renderer,fras);
+    scan=SDL_CreateTextureFromSurface(renderer,scans);
+    lock_his_ass_up=SDL_CreateTextureFromSurface(renderer,lockups);
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -448,6 +480,9 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(win);
     SDL_FreeSurface(loa);
     SDL_FreeSurface(fras);
+    SDL_FreeSurface(scans);
+    SDL_FreeSurface(lockups);
+    
     
 
 }
@@ -657,7 +692,7 @@ void uinter::layout(int* mode){
                                 break;
                         }
                         sdl.drawtext(100,600,"type : "+tempn2);
-                        if (newbb.locked==true){
+                        if (newbb.locked==1){
                             sdl.drawtext(100,620,"locked : yes");
                         }else{
                             sdl.drawtext(100,620,"locked : no");
@@ -786,7 +821,6 @@ void uinter::layout(int* mode){
         std::string line;
         std::getline(fike,line);
         sig=line[0];
-        std::string sign;
         std::cout<<sig;
         if (sig=="0"){
             sign="hand closed";
@@ -797,7 +831,23 @@ void uinter::layout(int* mode){
         }else if(sig==""){
             sign="unknown";
         }
-        sdl.drawtext(500,300,"your sign is : "+sign);
+        
+        sdl.drawtext(500,200,"your sign is : "+sign);
+        draw(scan,520,200,200,150);
+        sdl.drawtext(470,0,"you have 10 seconds to show ur sign");
+        sdl.drawtext(500,350,"bank name : ");
+        sdl.drawtextarea(620,345,200,30);
+        if(!s1.empty()){
+            sdl.drawtext(625,350,s1.c_str());
+        }
+        draw(lock_his_ass_up,800,287,200,150);
+        if(!mes.empty()){
+            sdl.drawtext(0,690,mes.c_str());
+        }
+        //SDL_Rect test={840,335,120,40};
+        //SDL_SetRenderDrawColor(sdl.getrender(),0,0,0,255);
+        //SDL_RenderFillRect(sdl.getrender(),&test);
+
 
 
 
@@ -850,6 +900,19 @@ void uinter::handle(SDL_Event& event,int &mode){
                             else if(focus==2 && s3.length()<10) s3+=c;
                             else if(focus==3 && s3.length()<10) s4+=c;}
                             
+                }
+                break;
+            case 22:
+                if(key==SDLK_ESCAPE){
+                    mode=-1;
+                }
+                if(focus==0){
+                    if(key==SDLK_BACKSPACE && !s1.empty()){
+                        s1.pop_back();
+                    }
+                    if (key>=32 && key<=126) {  
+                                char c=(char)key;
+                                if (s1.length()<14){s1+=c;}}
                 }
                 break;
             case -2:
@@ -910,6 +973,26 @@ void uinter::handle(SDL_Event& event,int &mode){
         if(event.button.button==SDL_BUTTON_LEFT){
             int msx=event.button.x,msy=event.button.y;
             switch(mode){
+                case 22:
+                    if (checkms(msx,msy,840,335,120,40)){
+                        std::cout << "locking: [" << s1 << "] with sign: [" << sign << "]" << std::endl;
+                        if(db.lock(s1,sign)==false){
+                            mes="nah i dont have a bank with such name twin..."; 
+                        }else{
+                            mes="we done locked the bank twin";
+                        }
+                        
+                    }
+                    if (checkms(msx,msy,555,255,120,40)){
+                        rd=false;
+                        
+                    }
+                    if (checkms(msx,msy,620,345,200,30)){
+                        focus=0;
+                    }else{
+                        focus=-1;
+                    }
+                    break;
                 case 1:
                     if (checkms(msx,msy,0,165,100,70)){
                         vit-=1;
@@ -994,6 +1077,8 @@ void uinter::handle(SDL_Event& event,int &mode){
                         }
                     }else if(checkms(msx,msy,370,0,210,60)){
                         mode=22;
+                        mes="";
+                        s1="";
                         rt=SDL_GetTicks();
                     }else if(checkms(msx,msy,0,570,170,150)){
                         lt=SDL_GetTicks();

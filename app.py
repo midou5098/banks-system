@@ -42,7 +42,7 @@ while True:
         
    
     
-    if cv2.waitKey(1) & 0xFF == ord('q') or timeps-timep>10:
+    if cv2.waitKey(1) & 0xFF == ord('q') or timeps-timep>3:
         break
     if result.multi_hand_landmarks is not None:
         for hands_landmark in result.multi_hand_landmarks:
