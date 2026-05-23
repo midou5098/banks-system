@@ -102,13 +102,12 @@ int database::add(bank nb){
                 sqlite3_bind_int(stmt, 9, -1);
             }
             sqlite3_bind_text(stmt,10,nb.sign.c_str(),-1,SQLITE_STATIC);
-            
             int result = sqlite3_step(stmt);
             sqlite3_finalize(stmt); 
             if (result != SQLITE_DONE) {
                 return -1;
             }
-    return true;
+    return 1;
 }
 
 bool database::search(std::string name,bool& found,bank& banki){
@@ -659,9 +658,9 @@ void uinter::layout(int* mode){
                         }
                         sdl.drawtext(100,600,"type : "+tempn2);
                         if (newbb.locked==true){
-                            sdl.drawtext(100,600,"locked : yes");
+                            sdl.drawtext(100,620,"locked : yes");
                         }else{
-                            sdl.drawtext(100,600,"locked no");
+                            sdl.drawtext(100,620,"locked : no");
                         }
                          }
                     }else{
@@ -1021,8 +1020,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if (checkms(msx,msy,440,475,400,400)){
                         newb.locked=false;
                         newb.sign="";
-                        
-                        if(db.add(newb)!=1){
+                        if(db.add(newb)==1){
                             mes="bank addded";
                         }else{
                             mes="u fucked up twin";
