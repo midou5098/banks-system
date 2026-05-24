@@ -53,7 +53,7 @@ class database{
     public:
     int opening(void);
     bool search(std::string name,bool& found,bank& banki);
-    bool remove(bank nb);
+    bool remove(std::string s);
     int modify(bank nb);
     int add(bank nb);
     bool lock(std::string name,std::string sign);
@@ -80,6 +80,31 @@ bool database::lock(std::string name,std::string sign){
     }
     
 }
+
+bool database::remove(std::string s){
+    sqlite3_stmt* stmt;
+    const char* sql;
+    sql="DELETE FROM banks WHERE name=?";
+    sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+    sqlite3_bind_text(stmt,1,s.c_str(),-1,SQLITE_STATIC);
+    if(sqlite3_step(stmt)==SQLITE_DONE){
+        sqlite3_finalize(stmt);
+        return true;
+
+    }else {
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+}
+
+
+
+
+
+
+
+
 
 int database::opening(void){
         
@@ -154,6 +179,7 @@ bool database::search(std::string name,bool& found,bank& banki){
             banki.locked=false;
         }
     }else{
+            found=false;
             std::cout <<"found";
         }sqlite3_finalize(stmt);
         return true;
@@ -268,10 +294,10 @@ class uinter{
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
-        SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up;
+        SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
-        bool isdrg=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
+        bool isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
 
     public:
         
@@ -325,7 +351,7 @@ void uinter::animatepop(void){
     windr={-110,wy,1500,1000};
     
     timer=SDL_GetTicks();
-    if(timer>ltimer+4  ){
+    if(timer>ltimer+1  ){
         if(up==true && wy>-70){
             wy-=10;
             ltimer=timer;
@@ -393,6 +419,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* fras=IMG_Load("assets/ui/managerfra.png");
     SDL_Surface* scans=IMG_Load("assets/ui/scan.png");
     SDL_Surface* lockups=IMG_Load("assets/ui/lock_his_ass_up.png");
+    SDL_Surface* dbbs=IMG_Load("assets/ui/delete.png");
     
     
 
@@ -447,7 +474,9 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     wind=SDL_CreateTextureFromSurface(renderer,win);
     managfra=SDL_CreateTextureFromSurface(renderer,fras);
     scan=SDL_CreateTextureFromSurface(renderer,scans);
-    lock_his_ass_up=SDL_CreateTextureFromSurface(renderer,lockups);
+    lock_his_ass_up=SDL_CreateTextureFromSurface(renderer,lockups);    
+    dbb=SDL_CreateTextureFromSurface(renderer,dbbs);
+
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -482,6 +511,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(fras);
     SDL_FreeSurface(scans);
     SDL_FreeSurface(lockups);
+    SDL_FreeSurface(dbbs);
     
     
 
@@ -652,10 +682,65 @@ void uinter::layout(int* mode){
                     sdl.drawbut(900,190,100,30,180,150,240,"search");
                     if(bmode==0){
                         if(found==true){
+                            sdl.drawtext(100,350,"bank name : "+newbb.name);
+                            sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
+                            sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
+                            sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
+                            std::string tempn;
+                            switch(newbb.manager){
+                                case 1:
+                                    tempn="jew";
+                                    temptex=jew; 
+                                    break;
+                                case 2:
+                                    tempn="kirk";
+                                    temptex=kirk; 
+                                    break;
+                                case 3:
+                                    tempn="adolf";
+                                    temptex=adolf; 
+                                    break;
+                                case 4:
+                                    tempn="captain";
+                                    temptex=somal; 
+                                    break;
+                            }
+                            SDL_Rect fr={950,430,350,300};
+                            SDL_Rect mn={1055,502,150,150};
+                            SDL_RenderCopy(renderer,managfra,NULL,&fr);
+                            SDL_RenderCopy(renderer,temptex,NULL,&mn);
+                            sdl.drawtext(100,550,"manager : "+tempn);
+                            switch(newbb.type){
+                                case 0:
+                                    tempn2="modern bank";
+                                    break;
+                                case 1:
+                                    tempn2="country bank";
+                                    break;
+                                case 2:
+                                    tempn2="billionaires bank";
+                                    break;
+                            }
+                            sdl.drawtext(100,600,"type : "+tempn2);
+                            if (newbb.locked==1){
+                                sdl.drawtext(100,620,"locked : yes");
+                            }else{sdl.drawtext(100,620,"locked : no");}
+                         }else{
+                            sdl.drawtext(50,350,"not found twin");
+                         }
+                    }else if (bmode==1){
+                        if(found==true){
                         sdl.drawtext(100,350,"bank name : "+newbb.name);
                         sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
                         sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
                         sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
+                        if(!mes.empty()){sdl.drawtext(400,580,mes);}
+                        if(cd){
+                            draw(dbb,1000,300,250,250);
+                            //SDL_Rect test={1060,385,130,60};
+                            //SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                            //SDL_RenderFillRect(renderer,&test);
+                        }
                         std::string tempn;
                         switch(newbb.manager){
                             case 0:
@@ -697,9 +782,15 @@ void uinter::layout(int* mode){
                         }else{
                             sdl.drawtext(100,620,"locked : no");
                         }
+                         }else{
+                            sdl.drawtext(100,350,"not found twin");
                          }
-                    }else{
-                        sdl.drawtext(100,350,"not found twin");
+
+
+
+
+
+
 
                     }
                     
@@ -942,6 +1033,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                         up=false;
                         bmode=-1;
                         lt=0;
+                        newbb.clients=0;
+                        newbb.funds=0;
+                        newbb.inter=0;
+                        newb.locked=false;
+                        newbb.name="";
                         
                         
                     }
@@ -1041,11 +1137,24 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;
                 case -1:
                     if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
-                        db.search(s1.c_str(),found,newbb);}
+                        db.search(s1.c_str(),found,newbb);
+                        if(bmode==1 && found==true){
+                            cd=true;
+                        }}
                     if(onboard==true){
                         if(checkms(msx,msy,725,200,150,30)){
                             focus=1;
+
                         }
+                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
+                            if(db.remove(s1)){
+                                mes="done nuked the whole bank";
+                            }else{
+                                mes="error type shi";
+                            }
+                        
+                        }
+
                     }
                     if (fs==false){
                         isdrg=true;
