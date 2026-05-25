@@ -1267,6 +1267,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
                             if(db.remove(s1)){
                                 mes="done nuked the whole bank";
+                                bankvec=db.loadbanks();
 
                             }else{
                                 mes="error type shi";
@@ -1342,8 +1343,9 @@ void uinter::handle(SDL_Event& event,int &mode){
                         s2="";
                         s3="";
                         s4="";
+                        bankvec=db.loadbanks();
                         mode=-1;
-                        db.loadbanks();
+                        
                     }
                     break;
 
