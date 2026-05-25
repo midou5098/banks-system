@@ -1,3 +1,4 @@
+//this code is messy , has god classes , very chaotic , yet , its beautiful to me , took a big share of my time , hardest thing was figuring the drag and click system , hard challenge yet it was easy somehow , same 32 seconds of dopamine 
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
 #ifndef HEADERS_H
@@ -63,13 +64,13 @@ std::vector<bank> database::loadbanks(void){
     std::vector<bank> bankvec;
     sqlite3_stmt* stmt;
     const char* sql;
-    sql="SELECT name,type,x,y,lock FROM banks";
+    sql="SELECT name, type, interest, funds, clients, manager, x, y, lock, sign FROM banks";
     sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
     while(sqlite3_step(stmt)==SQLITE_ROW){
         bank b;
         b.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        b.inter = sqlite3_column_int(stmt, 1);
-        b.type = sqlite3_column_int(stmt, 2);
+        b.type= sqlite3_column_int(stmt, 1);
+        b.inter = sqlite3_column_int(stmt, 2);
         b.manager = sqlite3_column_int(stmt, 3);
         b.clients = sqlite3_column_int(stmt, 4);
         b.funds = sqlite3_column_int(stmt, 5);
@@ -79,9 +80,9 @@ std::vector<bank> database::loadbanks(void){
         b.sign = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
         
         bankvec.push_back(b);
-        std::cout<<we got the 
+        std::cout<<"we got the banks";
     }
-    return 
+    return bankvec;
     
 
 
@@ -375,7 +376,30 @@ class uinter{
 
 void uinter::renderbanks(void){
     SDL_Renderer* renderer=sdl.getrender();
+    SDL_Texture* chosen;
+    SDL_Rect rect;
     if(!fs){
+        for(const auto& b: bankvec){
+            switch(b.type){
+                case 1:
+                    chosen=mbank;
+                    break;
+                case 2:
+                    chosen=cbank;
+                    break;
+                case 3:
+                    chosen=bbank;
+                    break;
+                
+            }
+            rect.x = (int)b.x + worldx;
+            rect.y = (int)b.y + worldy;
+            rect.w=100;
+            rect.h=100;
+            SDL_RenderCopy(renderer,chosen,NULL,&rect);
+
+
+        }
 
     }
 
@@ -892,7 +916,7 @@ void uinter::layout(int* mode){
                     
                 }
     }
-        
+    renderbanks();
         
         //SDL_Rect test={0,570,170,150};
         //SDL_SetRenderDrawColor(renderer,0,0,0,255);
@@ -1105,7 +1129,8 @@ void uinter::handle(SDL_Event& event,int &mode){
             case -2:
                 if(key==SDLK_f){
                     if(db.opening()==1){
-                    mode=-1;
+                        bankvec=db.loadbanks();
+                        mode=-1;
                 }else{
                     mes="wrong db mf...";
                 }
@@ -1321,6 +1346,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         s3="";
                         s4="";
                         mode=-1;
+                        renderbanks();
                     }
                     break;
 
