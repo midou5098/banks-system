@@ -80,7 +80,7 @@ std::vector<bank> database::loadbanks(void){
         b.sign = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
         
         bankvec.push_back(b);
-        std::cout<<"we got the banks";
+        std::cout<<b.x;
     }
     return bankvec;
     
@@ -120,7 +120,6 @@ bool database::lock(std::string name,std::string sign){
     const char* sql;
     sql="UPDATE banks SET lock = ?, sign = ? WHERE name =?";
     sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
-    std::cout << sqlite3_errmsg(db) << std::endl;
     sqlite3_bind_int(stmt,1,1);
     sqlite3_bind_text(stmt,2,sign.c_str(),-1,SQLITE_STATIC);
     sqlite3_bind_text(stmt,3,name.c_str(),-1,SQLITE_STATIC);
@@ -222,7 +221,6 @@ bool database::search(std::string name,bool& found,bank& banki){
     sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
     sqlite3_bind_text(stmt,1,name.c_str(),-1,SQLITE_STATIC);
     if(sqlite3_step(stmt)==SQLITE_ROW){
-        std::cout <<"found";
         found=true;
         banki.name=reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)),
         banki.type=sqlite3_column_int(stmt, 1),
@@ -237,7 +235,6 @@ bool database::search(std::string name,bool& found,bank& banki){
         }
     }else{
             found=false;
-            std::cout <<"found";
         }sqlite3_finalize(stmt);
         return true;
 
@@ -380,10 +377,7 @@ void uinter::renderbanks(void){
     SDL_Rect rect;
     if(!fs){
         for(const auto& b: bankvec){
-            std::cout << "bank: " << b.name << " type=" << b.type 
-              << " x=" << b.x << " y=" << b.y 
-              << " screenx=" << (int)b.x+worldx 
-              << " screeny=" << (int)b.y+worldy << "\n";
+
             switch(b.type){
                 case 0:
                     chosen=mbank;
@@ -396,10 +390,12 @@ void uinter::renderbanks(void){
                     break;
                 
             }
-            rect.x = (int)(b.x * 3840)+160+worldx;
-            rect.y = (int)(b.y * 2160)+90+worldy;
+            rect.x = (b.x * 3840)+worldx;
+            rect.y = (b.y * 2160)+worldy;
+            std::cout<<rect.x;
             rect.w=100;
             rect.h=100;
+            SDL_SetRenderDrawColor(renderer,0,0,0,255);
             SDL_RenderCopy(renderer,chosen,NULL,&rect);
 
 
@@ -1021,7 +1017,6 @@ void uinter::layout(int* mode){
         sdl.drawtext(900,400,"coords : "+std::to_string(newb.x)+" , "+std::to_string(newb.y));
         sdl.drawtext(900,450,"location:   god knows where ....");
         if (isdrg){
-            std::cout<<"dragging";
         }
         draw(nbutton,440,475,400,400);
     }else if(*mode==-2){
@@ -1036,7 +1031,6 @@ void uinter::layout(int* mode){
         std::string line;
         std::getline(fike,line);
         sig=line[0];
-        std::cout<<sig;
         if (sig=="0"){
             sign="hand closed";
         }else if(sig=="1"){
@@ -1196,7 +1190,6 @@ void uinter::handle(SDL_Event& event,int &mode){
             switch(mode){
                 case 22:
                     if (checkms(msx,msy,840,335,120,40)){
-                        std::cout << "locking: [" << s1 << "] with sign: [" << sign << "]" << std::endl;
                         if(db.lock(s1,sign)==false){
                             mes="nah i dont have a bank with such name twin..."; 
                         }else{
@@ -1330,8 +1323,8 @@ void uinter::handle(SDL_Event& event,int &mode){
                 case 12:{
                     if (checkms(msx,msy,160,90,1120,630)){
                         newb.x=((msx-160.0)/1120.0);
-                        newb.y=((msy-90.0)/630.0);
-                        std::cout<<newb.x<<newb.y;
+                        newb.y=((msy-90.0)/540.0);
+                        std::cout<<newb.x;
                         mode=13;
                     }
 
@@ -1350,7 +1343,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         s3="";
                         s4="";
                         mode=-1;
-                        renderbanks();
+                        db.loadbanks();
                     }
                     break;
 
