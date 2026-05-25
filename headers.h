@@ -57,7 +57,63 @@ class database{
     int modify(bank nb);
     int add(bank nb);
     bool lock(std::string name,std::string sign);
+    std::vector<bank> loadbanks(void);
 };
+std::vector<bank> database::loadbanks(void){
+    std::vector<bank> bankvec;
+    sqlite3_stmt* stmt;
+    const char* sql;
+    sql="SELECT name,type,x,y,lock FROM banks";
+    sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
+    while(sqlite3_step(stmt)==SQLITE_ROW){
+        bank b;
+        b.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        b.inter = sqlite3_column_int(stmt, 1);
+        b.type = sqlite3_column_int(stmt, 2);
+        b.manager = sqlite3_column_int(stmt, 3);
+        b.clients = sqlite3_column_int(stmt, 4);
+        b.funds = sqlite3_column_int(stmt, 5);
+        b.x = sqlite3_column_double(stmt, 6);
+        b.y = sqlite3_column_double(stmt, 7);
+        b.locked = sqlite3_column_int(stmt, 8) != 0;  // Convert int to bool
+        b.sign = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
+        
+        bankvec.push_back(b);
+        std::cout<<we got the 
+    }
+    return 
+    
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool database::lock(std::string name,std::string sign){
     sqlite3_stmt* stmt;
     const char* sql;
@@ -298,7 +354,7 @@ class uinter{
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
         bool isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
-
+        std::vector<bank> bankvec;
     public:
         
         void layout(int* mode);
@@ -310,10 +366,50 @@ class uinter{
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         void window(void);
         void animatepop(void);
+        void renderbanks(void);
         
         void shuffle(void){j=rand()%5;};
         uinter(SDLinit& sdlo,database& dbo);
     };
+
+
+void uinter::renderbanks(void){
+    SDL_Renderer* renderer=sdl.getrender();
+    if(!fs){
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1149,6 +1245,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
                             if(db.remove(s1)){
                                 mes="done nuked the whole bank";
+
                             }else{
                                 mes="error type shi";
                             }
