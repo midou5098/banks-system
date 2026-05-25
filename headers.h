@@ -380,20 +380,24 @@ void uinter::renderbanks(void){
     SDL_Rect rect;
     if(!fs){
         for(const auto& b: bankvec){
+            std::cout << "bank: " << b.name << " type=" << b.type 
+              << " x=" << b.x << " y=" << b.y 
+              << " screenx=" << (int)b.x+worldx 
+              << " screeny=" << (int)b.y+worldy << "\n";
             switch(b.type){
-                case 1:
+                case 0:
                     chosen=mbank;
                     break;
-                case 2:
+                case 1:
                     chosen=cbank;
                     break;
-                case 3:
+                case 2:
                     chosen=bbank;
                     break;
                 
             }
-            rect.x = (int)b.x + worldx;
-            rect.y = (int)b.y + worldy;
+            rect.x = (int)(b.x * 3840)+160+worldx;
+            rect.y = (int)(b.y * 2160)+90+worldy;
             rect.w=100;
             rect.h=100;
             SDL_RenderCopy(renderer,chosen,NULL,&rect);
@@ -1325,8 +1329,8 @@ void uinter::handle(SDL_Event& event,int &mode){
                     break;
                 case 12:{
                     if (checkms(msx,msy,160,90,1120,630)){
-                        newb.x=((msx-320.0)/1120.0)*1280;
-                        newb.y=((msy-180.0)/630.0)*720;
+                        newb.x=((msx-160.0)/1120.0);
+                        newb.y=((msy-90.0)/630.0);
                         std::cout<<newb.x<<newb.y;
                         mode=13;
                     }
