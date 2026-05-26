@@ -1,170 +1,156 @@
-# BankSim / SDL Banking Sandbox
+# 🏦 Bank Manager
 
-> A chaotic SDL2 + SQLite powered banking sandbox/game where you create banks, manage worlds, and interact through a custom GUI system.
-> **Currently in active development.**
+> A desktop bank management application built with C++ and SDL2, featuring an interactive map interface, SQLite persistence, and a Python-powered recognition system.
+
+> ⚠️ **This project is currently under active development and is not yet feature-complete.**
 
 ---
 
-## Preview
+## Overview
+
+Bank Manager is a graphical desktop application that lets you manage a network of banks laid out on an interactive world map. Banks can be added, searched, deleted, and locked — all through a custom-built SDL2 UI with animated windows, sprite-based icons, and a drag-to-pan map system.
 
 ---
 
 ## Features
 
-* 🏦 Create and manage custom banks
-* 🌍 Scrollable world/map system
-* 🎮 Fully custom SDL2 interface
-* 🗄️ SQLite database integration
-* 🖼️ Asset-driven UI and animated sprites
-* 📂 Native file dialog database loading
-* 👤 Multiple manager archetypes
-* 🔄 Interactive viewport + draggable camera
-* ✨ Animated windows and transitions
+### ✅ Implemented
+- **Interactive world map** — pan across a large tiled map using arrow keys or click-and-drag
+- **Bank placement** — place new banks at precise map coordinates by clicking
+- **Bank types** — support for multiple bank categories (merchant, commercial, central), each with its own sprite
+- **SQLite database** — all bank data is persisted to a `.db` file selected at startup via a native file dialog
+- **Add banks** — multi-step form to enter bank name, interest rate, funds, clients, manager, type, and map position
+- **Search banks** — floating panel to look up a bank by name
+- **Delete banks** — remove a bank from the database
+- **Lock banks** — lock a bank record with a signature (admin action)
+- **Manager selection** — choose from multiple manager characters during bank creation
+- **Animated pop-up windows** — smooth slide-in/out panel animations
+- **Sprite animations** — frame-based sprite sheet animation system
+- **Python recognition module** — launches a background `app.py` script for external processing
+
+### 🚧 In Progress / Planned
+- News feed panel
+- Client management system (data model exists, UI pending)
+- Full CRUD for clients
+- Improved error handling and validation
+- UI polish and layout refinements
 
 ---
 
 ## Tech Stack
 
-* **C++**
-* SDL
-* SQLite
-* SDL_image
-* SDL_ttf
-* SDL2_gfx
-* Native File Dialog (NFD)
-
----
-
-## Current State
-
-⚠️ This project is still heavily under development.
-
-Things currently being worked on:
-
-* Database search system
-* Bank modification/removal
-* Better UI architecture
-* Gameplay balancing
-* More world interaction
-* Cleaner code structure
-* Save/load improvements
-* Additional animations and effects
+| Component | Library/Tool |
+|---|---|
+| Graphics & Window | SDL2 |
+| Text rendering | SDL2_ttf |
+| Image loading | SDL2_image |
+| Shapes/primitives | SDL2_gfx |
+| Database | SQLite3 |
+| File dialogs | Native File Dialog (nfd) |
+| Recognition module | Python (`app.py`) |
 
 ---
 
 ## Project Structure
 
-```bash
+```
 .
-├── main.cpp
-├── headers.h
-├── assets/
-│   ├── map/
-│   ├── buttons/
-│   ├── ui/
-│   └── ...
-├── font.ttf
-└── database.db
+├── main.cpp          # Entry point — event loop, mode management
+├── headers.h         # All classes and logic (SDLinit, database, uinter)
+├── font.ttf          # UI font
+├── app.py            # Python recognition module (background process)
+└── assets/
+    ├── map/          # Tiled world map (3x3 grid of PNG tiles)
+    ├── buttons/      # UI button sprites (add, search, delete, lock, news)
+    ├── ui/           # UI panels (window, manager frame, scan overlay, etc.)
+    ├── bbank.png     # Big/central bank sprite
+    ├── mbank.png     # Merchant bank sprite
+    ├── cbank.png     # Commercial bank sprite
+    ├── tip1-5.png    # Tip/hint images
+    └── ...           # Manager character sprites
 ```
 
 ---
 
-## Build Requirements
+## Building
 
-Install:
+### Dependencies
 
-* SDL2
-* SDL2_image
-* SDL2_ttf
-* SDL2_gfx
-* SQLite3
-* Native File Dialog Extended (NFD)
+Make sure the following are installed on your system:
 
-### Linux Example
+- `SDL2`
+- `SDL2_ttf`
+- `SDL2_image`
+- `SDL2_gfx`
+- `sqlite3`
+- `nfd` (Native File Dialog)
+
+On Debian/Ubuntu:
+```bash
+sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-gfx-dev libsqlite3-dev
+```
+
+`nfd` may need to be built from source: https://github.com/btzy/nativefiledialog-extended
+
+### Compile
 
 ```bash
-sudo apt install libsdl2-dev libsdl2-image-dev \
-libsdl2-ttf-dev libsdl2-gfx-dev sqlite3 \
-libsqlite3-dev
+g++ main.cpp -o bankmanager \
+  -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_gfx \
+  -lsqlite3 -lnfd \
+  -std=c++17
 ```
 
----
-
-## Build
+### Run
 
 ```bash
-g++ main.cpp -o banksim \
--lSDL2 -lSDL2_image -lSDL2_ttf \
--lSDL2_gfx -lsqlite3
+./bankmanager
+```
+
+On launch, a file dialog will prompt you to open an existing `.db` database file.
+
+---
+
+## Database Schema
+
+The application expects a SQLite database with a `banks` table:
+
+```sql
+CREATE TABLE banks (
+    name     TEXT,
+    type     INTEGER,
+    interest INTEGER,
+    funds    INTEGER,
+    clients  INTEGER,
+    manager  INTEGER,
+    x        REAL,
+    y        REAL,
+    lock     INTEGER,
+    sign     TEXT
+);
 ```
 
 ---
 
-## Run
+## Controls
 
-```bash
-./banksim
-```
-
----
-
-## Gameplay / Concept
-
-The idea is to create a weird sandbox-style banking simulation where players can:
-
-* Create banks
-* Place them on a world map
-* Assign managers
-* Handle reputation/funds/clients
-* Expand influence
-* Eventually interact with other systems and events
-
-The project mixes strategy, satire, and experimental UI ideas.
+| Input | Action |
+|---|---|
+| Arrow keys | Pan the map |
+| Click and drag | Pan the map |
+| Click on map (in placement mode) | Set bank position |
+| Click UI buttons | Navigate between modes |
 
 ---
 
-## Development Notes
+## Notes
 
-Current codebase includes:
-
-* SDL rendering loop
-* Event handling system
-* Animated textures
-* Database wrapper
-* UI state machine
-* Map viewport system
-* Drag camera controls
-* Popup animation system
-
-Core loop and rendering are implemented in `main.cpp` and `headers.h`.  
-
----
-
-## TODO
-
-* [ ] Proper search system
-* [ ] Database editor
-* [ ] Bank economy simulation
-* [ ] AI behavior
-* [ ] Sound system
-* [ ] Better asset management
-* [ ] Multiplayer experiments
-* [ ] Improved save handling
-* [ ] Code refactor
-
----
-
-## Contributing
-
-Since the repo is still evolving rapidly, contributions and ideas are welcome.
+- The project window title and some internal strings are placeholder/debug text — these will be cleaned up before release.
+- The codebase is intentionally monolithic for now (single header file with all logic). Refactoring into separate modules is planned.
+- The Python `app.py` script is launched as a background process via `system()` — integration is still being finalized.
 
 ---
 
 ## License
 
-MIT
----
-
-## Author
-
-Made by Mohamed Amdouni.
+Not yet decided. All rights reserved for now.
