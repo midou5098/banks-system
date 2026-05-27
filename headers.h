@@ -20,6 +20,7 @@
 #include <math.h>
 #include <tinyfiledialogs.h> // tinyfiledialogs was interrupting the sdl while i get the file which caused crashes and freezes sos i switched to nfd
 #include <nfd/nfd.h>
+#include <iomanip>
 
 void recognition(void){
     system("python app.py &");
@@ -344,9 +345,9 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int l=0,rdu,current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
-        Uint32 gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
-        SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
+        int cf=1,l=0,rdu,current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
+        Uint32 ct,gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
+        SDL_Texture *mbank,*cuts,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
@@ -354,6 +355,7 @@ class uinter{
         bank newb,newbb,srb;
         bool isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
         std::vector<bank> bankvec;
+        std::vector<SDL_Texture*> adolfcs,kirkcs,jewcs,somalcs;
     public:
         
         void layout(int* mode);
@@ -367,10 +369,62 @@ class uinter{
         void animatepop(void);
         void updatebanks(void);
         void renderbanks(void);
+        void cutscene(int mang);
         
         void shuffle(void){j=rand()%5;};
         uinter(SDLinit& sdlo,database& dbo);
     };
+
+void uinter::cutscene(int mang){
+    if(SDL_GetTicks()-ct>100 && cf+1<=142){
+        
+        ct=SDL_GetTicks();
+        cf++;
+        switch(mang){
+            case 0 :
+                cuts=jewcs[cf];
+                break;
+            case 1 :
+                cuts=kirkcs[cf];
+                break;
+            case 2:
+                cuts=adolfcs[cf];
+                break;
+            case 3:
+                cuts=somalcs[cf];
+                break;
+        }
+        
+
+    }
+    SDL_Rect recto={0,0,1280,720};
+    SDL_RenderCopy(sdl.getrender(),cuts,NULL,&recto);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void uinter::renderbanks(void){
@@ -639,6 +693,51 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
         tips.push_back(texture);
         SDL_FreeSurface(surface);
+    }
+
+
+    for (int i = 1; i <= 142; i++) {
+        std::ostringstream s;
+        s << "assets/cutscenes/adolf/ezgif-frame-" << std::setw(3) << std::setfill('0') << i << ".jpg";
+        SDL_Surface* surface = IMG_Load(s.str().c_str());
+        if (surface) {  // Check if loaded successfully
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+            adolfcs.push_back(texture);
+            SDL_FreeSurface(surface);
+        }
+    }
+
+    for (int i = 1; i <= 142; i++) {
+        std::ostringstream s;
+        s << "assets/cutscenes/kirk/ezgif-frame-" << std::setw(3) << std::setfill('0') << i << ".jpg";
+        SDL_Surface* surface = IMG_Load(s.str().c_str());
+        if (surface) {  // Check if loaded successfully
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+            kirkcs.push_back(texture);
+            SDL_FreeSurface(surface);
+        }
+    }
+
+    for (int i = 1; i <= 142; i++) {
+        std::ostringstream s;
+        s << "assets/cutscenes/jew/ezgif-frame-" << std::setw(3) << std::setfill('0') << i << ".jpg";
+        SDL_Surface* surface = IMG_Load(s.str().c_str());
+        if (surface) {  // Check if loaded successfully
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+            jewcs.push_back(texture);
+            SDL_FreeSurface(surface);
+        }
+    }
+
+    for (int i = 1; i <= 142; i++) {
+        std::ostringstream s;
+        s << "assets/cutscenes/somal/ezgif-frame-" << std::setw(3) << std::setfill('0') << i << ".jpg";
+        SDL_Surface* surface = IMG_Load(s.str().c_str());
+        if (surface) {  // Check if loaded successfully
+            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+            somalcs.push_back(texture);
+            SDL_FreeSurface(surface);
+        }
     }
 
 
