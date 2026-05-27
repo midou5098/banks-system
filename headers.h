@@ -1,6 +1,7 @@
 //this code is messy , has god classes , very chaotic , yet , its beautiful to me , took a big share of my time , hardest thing was figuring the drag and click system , hard challenge yet it was easy somehow , same 32 seconds of dopamine 
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
+#include <SDL2/SDL_timer.h>
 #ifndef HEADERS_H
 #include <sqlite3.h>
 #include <SDL2/SDL_render.h>
@@ -344,11 +345,11 @@ class uinter{
         SDLinit& sdl;
         database& db;
         int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
-        Uint32 rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
+        Uint32 gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
-        SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb;
+        SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
         bool isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
@@ -364,6 +365,7 @@ class uinter{
         bool checkms(int msx,int msy,int x,int y,int w,int h);
         void window(void);
         void animatepop(void);
+        void updatebanks(void);
         void renderbanks(void);
         
         void shuffle(void){j=rand()%5;};
@@ -432,6 +434,48 @@ void uinter::renderbanks(void){
 
 }
 
+void uinter::updatebanks(void){
+    SDL_Texture* chosen;
+    
+        for(const auto& b: bankvec){
+            int rd=rand()%2;
+            if(rd==0){
+                switch(b.type){
+                    case 0:
+                        chosen=cbank_gr;
+                        break;
+                    case 1:
+                        chosen=mbank_gr;
+                        break;
+                    case 2:
+                        chosen=bbank_gr;
+                        break;
+                
+            }
+            }else{
+                switch(b.type){
+                    case 0:
+                        chosen=cbank_re;
+                        break;
+                    case 1:
+                        chosen=mbank_re;
+                        break;
+                    case 2:
+                        chosen=bbank_re;
+                        break;
+                
+            }
+            }
+
+            
+            if(!fs){
+                animate(chosen,(b.x * 3840)+worldx,(b.y * 2160)+worldy,100,100,-1);
+            }else{
+                animate(chosen,(b.x * 1280),(b.y * 720),100,100,-1);
+            }
+
+        }
+    }
 
 
 
@@ -561,7 +605,14 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* scans=IMG_Load("assets/ui/scan.png");
     SDL_Surface* lockups=IMG_Load("assets/ui/lock_his_ass_up.png");
     SDL_Surface* dbbs=IMG_Load("assets/ui/delete.png");
-    
+
+    SDL_Surface* mbgs=IMG_Load("assets/mbank_gr");
+    SDL_Surface* cbgs=IMG_Load("assets/cbank_gr");
+    SDL_Surface* bbgs=IMG_Load("assets/bbank_gr");
+    SDL_Surface* mbrs=IMG_Load("assets/mbank_re");
+    SDL_Surface* cbrs=IMG_Load("assets/cbank_re");
+    SDL_Surface* bbrs=IMG_Load("assets/bbank_re");
+
     
 
     SDL_Surface* maps1=IMG_Load("assets/map/maptl.png");
@@ -618,6 +669,13 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     lock_his_ass_up=SDL_CreateTextureFromSurface(renderer,lockups);    
     dbb=SDL_CreateTextureFromSurface(renderer,dbbs);
 
+    mbank_gr=SDL_CreateTextureFromSurface(renderer,mbgs);
+    cbank_gr=SDL_CreateTextureFromSurface(renderer,cbgs);
+    bbank_gr=SDL_CreateTextureFromSurface(renderer,bbgs);
+    mbank_re=SDL_CreateTextureFromSurface(renderer,mbrs);
+    cbank_re=SDL_CreateTextureFromSurface(renderer,cbrs);
+    bbank_re=SDL_CreateTextureFromSurface(renderer,bbrs);
+
     
     mapst[0]=SDL_CreateTextureFromSurface(renderer,maps1);
     mapst[1]=SDL_CreateTextureFromSurface(renderer,maps2);
@@ -653,7 +711,14 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(scans);
     SDL_FreeSurface(lockups);
     SDL_FreeSurface(dbbs);
-    
+
+    SDL_FreeSurface(mbgs);
+    SDL_FreeSurface(cbgs);
+    SDL_FreeSurface(bbgs);
+    SDL_FreeSurface(mbrs);
+    SDL_FreeSurface(cbrs);
+    SDL_FreeSurface(bbrs);
+
     
 
 }
@@ -938,6 +1003,10 @@ void uinter::layout(int* mode){
                 }
     }
     renderbanks();
+    if(SDL_GetTicks()-gt>2000){
+        gt=SDL_GetTicks();
+        updatebanks();
+    }
         
         //SDL_Rect test={0,570,170,150};
         //SDL_SetRenderDrawColor(renderer,0,0,0,255);
@@ -1149,6 +1218,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                 if(key==SDLK_f){
                     if(db.opening()==1){
                         bankvec=db.loadbanks();
+                        gt=SDL_GetTicks();
                         mode=-1;
                 }else{
                     mes="wrong db mf...";
