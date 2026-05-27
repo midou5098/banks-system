@@ -344,7 +344,7 @@ class uinter{
     private:
         SDLinit& sdl;
         database& db;
-        int current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
+        int l=0,rdu,current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
         Uint32 gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
         SDL_Texture *mbank,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
@@ -377,6 +377,8 @@ void uinter::renderbanks(void){
     SDL_Renderer* renderer=sdl.getrender();
     SDL_Texture* chosen;
     SDL_Rect rect;
+    
+
     if(!fs){
         for(const auto& b: bankvec){
 
@@ -435,12 +437,17 @@ void uinter::renderbanks(void){
 }
 
 void uinter::updatebanks(void){
-    SDL_Texture* chosen;
+    if(bankvec.empty()) return;
+    if(SDL_GetTicks() - gt > 2000){
+        gt = SDL_GetTicks();
+        rdu = rand() % 2;
+        l = rand() % bankvec.size(); 
+    }
     
-        for(const auto& b: bankvec){
-            int rd=rand()%2;
-            if(rd==0){
-                switch(b.type){
+    bank& lucky = bankvec[l];
+    SDL_Texture* chosen ;
+    if(rdu==0){
+            switch(lucky.type){
                     case 0:
                         chosen=cbank_gr;
                         break;
@@ -451,9 +458,9 @@ void uinter::updatebanks(void){
                         chosen=bbank_gr;
                         break;
                 
-            }
+                }
             }else{
-                switch(b.type){
+                switch(lucky.type){
                     case 0:
                         chosen=cbank_re;
                         break;
@@ -465,17 +472,13 @@ void uinter::updatebanks(void){
                         break;
                 
             }
-            }
-
-            
-            if(!fs){
-                animate(chosen,(b.x * 3840)+worldx,(b.y * 2160)+worldy,100,100,-1);
-            }else{
-                animate(chosen,(b.x * 1280),(b.y * 720),100,100,-1);
-            }
-
-        }
+            };
+    if(!fs){
+        animate(chosen, (lucky.x*3840)+worldx, (lucky.y*2160)+worldy, 100, 100, -1);
+    } else {
+        animate(chosen, (lucky.x*1280), (lucky.y*720), 100, 100, -1);
     }
+}
 
 
 
@@ -606,12 +609,12 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_Surface* lockups=IMG_Load("assets/ui/lock_his_ass_up.png");
     SDL_Surface* dbbs=IMG_Load("assets/ui/delete.png");
 
-    SDL_Surface* mbgs=IMG_Load("assets/mbank_gr");
-    SDL_Surface* cbgs=IMG_Load("assets/cbank_gr");
-    SDL_Surface* bbgs=IMG_Load("assets/bbank_gr");
-    SDL_Surface* mbrs=IMG_Load("assets/mbank_re");
-    SDL_Surface* cbrs=IMG_Load("assets/cbank_re");
-    SDL_Surface* bbrs=IMG_Load("assets/bbank_re");
+    SDL_Surface* mbgs=IMG_Load("assets/mbank_gr.png");
+    SDL_Surface* cbgs=IMG_Load("assets/cbank_gr.png");
+    SDL_Surface* bbgs=IMG_Load("assets/bbank_gr.png");
+    SDL_Surface* mbrs=IMG_Load("assets/mbank_re.png");
+    SDL_Surface* cbrs=IMG_Load("assets/cbank_re.png");
+    SDL_Surface* bbrs=IMG_Load("assets/bbank_re.png");
 
     
 
@@ -1002,11 +1005,10 @@ void uinter::layout(int* mode){
                     
                 }
     }
+    
+    
     renderbanks();
-    if(SDL_GetTicks()-gt>2000){
-        gt=SDL_GetTicks();
-        updatebanks();
-    }
+    updatebanks();
         
         //SDL_Rect test={0,570,170,150};
         //SDL_SetRenderDrawColor(renderer,0,0,0,255);
@@ -1219,6 +1221,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if(db.opening()==1){
                         bankvec=db.loadbanks();
                         gt=SDL_GetTicks();
+                        rdu=rand()%2;
                         mode=-1;
                 }else{
                     mes="wrong db mf...";
