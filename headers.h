@@ -353,7 +353,7 @@ class uinter{
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb;
-        bool isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
+        bool cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
         std::vector<bank> bankvec;
         std::vector<SDL_Texture*> adolfcs,kirkcs,jewcs,somalcs;
     public:
@@ -376,7 +376,7 @@ class uinter{
     };
 
 void uinter::cutscene(int mang){
-    if(SDL_GetTicks()-ct>100 && cf+1<=142){
+    if(SDL_GetTicks()-ct>50 && cf+1<=142){
         
         ct=SDL_GetTicks();
         cf++;
@@ -497,6 +497,7 @@ void uinter::updatebanks(void){
         rdu = rand() % 2;
         l = rand() % bankvec.size(); 
     }
+    if(l >= (int)bankvec.size()) l = 0;
     
     bank& lucky = bankvec[l];
     SDL_Texture* chosen ;
@@ -1049,6 +1050,12 @@ void uinter::layout(int* mode){
                             //SDL_SetRenderDrawColor(renderer,0,0,0,255);
                             //SDL_RenderFillRect(renderer,&test);
                         }
+                        if(cip){
+                            cutscene(newbb.manager);   // call every frame — it handles its own timing internally
+                            if(cf >= 141){ 
+                                cd = false;
+                                cf = 0;
+                        }}
                         std::string tempn;
                         switch(newbb.manager){
                             case 0:
@@ -1459,9 +1466,11 @@ void uinter::handle(SDL_Event& event,int &mode){
                         }
                         if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
                             if(db.remove(s1)){
-                                db.search(name,found,newb);
-                                cutscene(newb.manager);
+                                
+                                cf=0;
+                                ct=0;
                                 mes="done nuked the whole bank";
+                                cip=true;
                                 bankvec=db.loadbanks();
 
                             }else{
