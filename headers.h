@@ -438,7 +438,7 @@ void uinter::renderbanks(void){
 
 void uinter::updatebanks(void){
     if(bankvec.empty()) return;
-    if(SDL_GetTicks() - gt > 2000){
+    if(SDL_GetTicks() - gt > 500){
         gt = SDL_GetTicks();
         rdu = rand() % 2;
         l = rand() % bankvec.size(); 
@@ -474,9 +474,9 @@ void uinter::updatebanks(void){
             }
             };
     if(!fs){
-        animate(chosen, (lucky.x*3840)+worldx, (lucky.y*2160)+worldy, 100, 100, -1);
+        animate(chosen, (lucky.x*3840)+worldx, (lucky.y*2160)+worldy, 100, 80, -1);
     } else {
-        animate(chosen, (lucky.x*1280), (lucky.y*720), 100, 100, -1);
+        animate(chosen, (lucky.x*1280), (lucky.y*720), 100, 80, -1);
     }
 }
 
