@@ -1053,9 +1053,10 @@ void uinter::layout(int* mode){
                         if(cip){
                             cutscene(newbb.manager);   // call every frame — it handles its own timing internally
                             if(cf >= 141){ 
-                                cd = false;
+                                cip = false;
                                 cf = 0;
-                        }}
+                        }
+                    }
                         std::string tempn;
                         switch(newbb.manager){
                             case 0:
