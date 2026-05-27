@@ -380,10 +380,10 @@ void uinter::renderbanks(void){
 
             switch(b.type){
                 case 0:
-                    chosen=mbank;
+                    chosen=cbank;
                     break;
                 case 1:
-                    chosen=cbank;
+                    chosen=mbank;
                     break;
                 case 2:
                     chosen=bbank;
@@ -395,12 +395,33 @@ void uinter::renderbanks(void){
             std::cout<<rect.x;
             rect.w=100;
             rect.h=100;
-            SDL_SetRenderDrawColor(renderer,0,0,0,255);
+            
             SDL_RenderCopy(renderer,chosen,NULL,&rect);
 
 
         }
 
+    }else {
+        for(const auto& b: bankvec){
+
+            switch(b.type){
+                case 0:
+                    chosen=cbank;
+                    break;
+                case 1:
+                    chosen=mbank;
+                    break;
+                case 2:
+                    chosen=bbank;
+                    break;
+                
+            }
+            rect.x = (b.x * 1280);
+            rect.y = (b.y * 720);
+            rect.w=100;
+            rect.h=100;
+            
+            SDL_RenderCopy(renderer,chosen,NULL,&rect);
     }
 
 
@@ -409,7 +430,7 @@ void uinter::renderbanks(void){
 
 
 
-
+}
 
 
 
