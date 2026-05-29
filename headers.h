@@ -381,16 +381,16 @@ void uinter::cutscene(int mang){
         ct=SDL_GetTicks();
         cf++;
         switch(mang){
-            case 0 :
+            case 1 :
                 cuts=jewcs[cf];
                 break;
-            case 1 :
+            case 2 :
                 cuts=kirkcs[cf];
                 break;
-            case 2:
+            case 3:
                 cuts=adolfcs[cf];
                 break;
-            case 3:
+            case 4:
                 cuts=somalcs[cf];
                 break;
         }
@@ -956,6 +956,8 @@ void uinter::layout(int* mode){
             rect[8]={852,480,428,240};
             viewport();
         }
+        renderbanks();
+        updatebanks();
         SDL_Rect rec1={990,-105,350,300};
         SDL_Rect rec2={760,-105,350,300};
         SDL_Rect rec3={530,-105,350,300};
@@ -972,6 +974,7 @@ void uinter::layout(int* mode){
         SDL_SetRenderDrawColor(renderer,0,0,0,no);
         SDL_Rect fsr={0,0,1280,720};
         SDL_RenderFillRect(renderer,&fsr);
+
         window();
         SDL_RenderCopy(sdl.getrender(),wind,NULL,&windr);
         
@@ -1050,28 +1053,22 @@ void uinter::layout(int* mode){
                             //SDL_SetRenderDrawColor(renderer,0,0,0,255);
                             //SDL_RenderFillRect(renderer,&test);
                         }
-                        if(cip){
-                            cutscene(newbb.manager);   // call every frame — it handles its own timing internally
-                            if(cf >= 141){ 
-                                cip = false;
-                                cf = 0;
-                        }
-                    }
+                        
                         std::string tempn;
                         switch(newbb.manager){
-                            case 0:
+                            case 1:
                                 tempn="jew";
                                 temptex=jew; 
                                 break;
-                            case 1:
+                            case 2:
                                 tempn="kirk";
                                 temptex=kirk; 
                                 break;
-                            case 2:
+                            case 3:
                                 tempn="adolf";
                                 temptex=adolf; 
                                 break;
-                            case 3:
+                            case 4:
                                 tempn="captain";
                                 temptex=somal; 
                                 break;
@@ -1101,6 +1098,13 @@ void uinter::layout(int* mode){
                          }else{
                             sdl.drawtext(100,350,"not found twin");
                          }
+                         if(cip){
+                            cutscene(newbb.manager); 
+                            if(cf >= 141){ 
+                                cip = false;
+                                cf = 0;
+                        }
+                    }
 
 
 
@@ -1114,8 +1118,7 @@ void uinter::layout(int* mode){
     }
     
     
-    renderbanks();
-    updatebanks();
+    
         
         //SDL_Rect test={0,570,170,150};
         //SDL_SetRenderDrawColor(renderer,0,0,0,255);
