@@ -352,7 +352,7 @@ class uinter{
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
         SDL_Rect rect[9],windr;
-        bank newb,newbb,srb;
+        bank newb,newbb,srb,clicked_bank;
         bool cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
         std::vector<bank> bankvec;
         std::vector<SDL_Texture*> adolfcs,kirkcs,jewcs,somalcs;
@@ -987,12 +987,13 @@ void uinter::layout(int* mode){
                     animate(load,570,300,140,140,-1);
 
                 }else{
-                    onboard=true;
-                    sdl.drawtext(500,200,"enter the banks name: ");
-                    sdl.drawtextarea(725,190,150,30);
-                    if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
-                    sdl.drawbut(900,190,100,30,180,150,240,"search");
+                    
                     if(bmode==0){
+                        onboard=true;
+                        sdl.drawtext(500,200,"enter the banks name: ");
+                        sdl.drawtextarea(725,190,150,30);
+                        if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
+                        sdl.drawbut(900,190,100,30,180,150,240,"search");
                         if(found==true){
                             sdl.drawtext(100,350,"bank name : "+newbb.name);
                             sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
@@ -1041,6 +1042,84 @@ void uinter::layout(int* mode){
                             sdl.drawtext(50,350,"not found twin");
                          }
                     }else if (bmode==1){
+                        onboard=true;
+                        sdl.drawtext(500,200,"enter the banks name: ");
+                        sdl.drawtextarea(725,190,150,30);
+                        if(!s1.empty()){sdl.drawtext(730,195,s1.c_str());}
+                        sdl.drawbut(900,190,100,30,180,150,240,"search");
+                        if(found==true){
+                        sdl.drawtext(100,350,"bank name : "+newbb.name);
+                        sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
+                        sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
+                        sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
+                        if(!mes.empty()){sdl.drawtext(400,580,mes);}
+                        if(cd){
+                            draw(dbb,1000,300,250,250);
+                            //SDL_Rect test={1060,385,130,60};
+                            //SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                            //SDL_RenderFillRect(renderer,&test);
+                        }
+                        
+                        std::string tempn;
+                        switch(newbb.manager){
+                            case 1:
+                                tempn="jew";
+                                temptex=jew; 
+                                break;
+                            case 2:
+                                tempn="kirk";
+                                temptex=kirk; 
+                                break;
+                            case 3:
+                                tempn="adolf";
+                                temptex=adolf; 
+                                break;
+                            case 4:
+                                tempn="captain";
+                                temptex=somal; 
+                                break;
+                        }
+                        SDL_Rect fr={950,430,350,300};
+                        SDL_Rect mn={1055,502,150,150};
+                        SDL_RenderCopy(renderer,managfra,NULL,&fr);
+                        SDL_RenderCopy(renderer,temptex,NULL,&mn);
+                        sdl.drawtext(100,550,"manager : "+tempn);
+                        switch(newbb.type){
+                            case 0:
+                                tempn2="modern bank";
+                                break;
+                            case 1:
+                                tempn2="country bank";
+                                break;
+                            case 2:
+                                tempn2="billionaires bank";
+                                break;
+                        }
+                        sdl.drawtext(100,600,"type : "+tempn2);
+                        if (newbb.locked==1){
+                            sdl.drawtext(100,620,"locked : yes");
+                        }else{
+                            sdl.drawtext(100,620,"locked : no");
+                        }
+                         }else{
+                            sdl.drawtext(100,350,"not found twin");
+                         }
+                         if(cip){
+                            cutscene(newbb.manager); 
+                            if(cf >= 141){ 
+                                cip = false;
+                                cf = 0;
+                        }
+                    }
+
+
+
+
+
+
+
+                    }else if (bmode==4){
+                        onboard=true;
                         if(found==true){
                         sdl.drawtext(100,350,"bank name : "+newbb.name);
                         sdl.drawtext(100,400,"interest : "+std::to_string(newbb.inter));
@@ -1113,7 +1192,7 @@ void uinter::layout(int* mode){
 
 
                     }
-                    
+                    //////
                 }
     }
     
@@ -1458,6 +1537,21 @@ void uinter::handle(SDL_Event& event,int &mode){
                     }
                     break;
                 case -1:
+                    for(const auto& b: bankvec){
+                        if(fs){
+                            if (checkms(msx,msy,(b.x * 1280),(b.y * 720),100,100)){
+                                lt=SDL_GetTicks();
+                                if (state==-1){
+                                    bmode=4;
+                                    popped=true;
+                                    up=true;
+                                    down=false;
+                                    state=1;
+                                    }
+                                    db.search(b.name,found,newbb);
+                        }
+
+                    }}
                     if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
                         db.search(s1.c_str(),found,newbb);
                         if(bmode==1 && found==true){
