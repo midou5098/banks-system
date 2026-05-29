@@ -1126,12 +1126,7 @@ void uinter::layout(int* mode){
                         sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
                         sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
                         if(!mes.empty()){sdl.drawtext(400,580,mes);}
-                        if(cd){
-                            draw(dbb,1000,300,250,250);
-                            //SDL_Rect test={1060,385,130,60};
-                            //SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                            //SDL_RenderFillRect(renderer,&test);
-                        }
+                        
                         
                         std::string tempn;
                         switch(newbb.manager){
@@ -1550,6 +1545,23 @@ void uinter::handle(SDL_Event& event,int &mode){
                                     }
                                     db.search(b.name,found,newbb);
                         }
+
+                    }else{
+                        if(checkms(msx,msy,(b.x * 3840)+worldx,(b.y * 2160)+worldy,100,100)){
+                            std::cout<<"clicked bank"<<b.name;
+                            lt=SDL_GetTicks();
+                                if (state==-1){
+                                    bmode=4;
+                                    popped=true;
+                                    up=true;
+                                    down=false;
+                                    state=1;
+                                    }
+                                    db.search(b.name,found,newbb);
+                        }
+
+
+
 
                     }}
                     if(onboard==true && !s1.empty() && checkms(msx,msy,900,190,100,30)){
