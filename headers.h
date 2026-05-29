@@ -347,7 +347,7 @@ class uinter{
         database& db;
         int cf=1,l=0,rdu,current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
         Uint32 ct,gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
-        SDL_Texture *mbank,*cuts,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
+        SDL_Texture *loss,*profit,*mbank,*cuts,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
@@ -685,6 +685,11 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
 
 
 
+    SDL_Surface* prs=IMG_Load("assets/ui/profit.png");
+    SDL_Surface* lss=IMG_Load("assets/ui/loss.png");
+
+
+
 
 
     for (int i = 1; i <= 5; i++) {
@@ -789,6 +794,10 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     mapst[6]=SDL_CreateTextureFromSurface(renderer,maps7);
     mapst[7]=SDL_CreateTextureFromSurface(renderer,maps8);
     mapst[8]=SDL_CreateTextureFromSurface(renderer,maps9);
+
+
+    profit=SDL_CreateTextureFromSurface(renderer,prs);
+    loss=SDL_CreateTextureFromSurface(renderer,lss);
     
     
     
@@ -814,6 +823,8 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(scans);
     SDL_FreeSurface(lockups);
     SDL_FreeSurface(dbbs);
+    SDL_FreeSurface(prs);
+    SDL_FreeSurface(lss);
 
     SDL_FreeSurface(mbgs);
     SDL_FreeSurface(cbgs);
@@ -1126,7 +1137,14 @@ void uinter::layout(int* mode){
                         sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
                         sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
                         if(!mes.empty()){sdl.drawtext(400,580,mes);}
-                        
+                        switch (rdu){
+                            case 0:
+                                draw(profit,400,200,400,300);
+                                break;
+                            case 1:
+                                draw(loss,400,200,400,300);
+                                break;
+                        }
                         
                         std::string tempn;
                         switch(newbb.manager){
