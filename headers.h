@@ -1426,7 +1426,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         rdu=rand()%2;
                         mode=-1;
                 }else{
-                    mes="wrong db mf...";
+                    mes="wrong db...";
                 }
                 }
                 break;
@@ -1518,7 +1518,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         focus=3;
                     }else if (checkms(msx,msy,440,475,400,400)){
                         if (s1.empty() || s2.empty() || s3.empty() || s4.empty()){
-                            mes="nigga fill all the fields bruh";
+                            mes="fill all the fields bruh";
                         }else{
                             mode=11;
                             newb.clients=std::stoi(s4.c_str());
@@ -1669,7 +1669,7 @@ void uinter::handle(SDL_Event& event,int &mode){
                         if(db.add(newb)==1){
                             mes="bank addded";
                         }else{
-                            mes="u fucked up twin";
+                            mes="you messed up  twin";
                         }
                         s1="";
                         s2="";
