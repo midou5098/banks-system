@@ -67,6 +67,9 @@ while True:
     print(f"dis nigga hands are ? {pito}")
     
     cv2.imshow("webcame",frame)
+with open("state.txt", "w") as file:
+    file.write("x")
 cap.release()
 cv2.destroyAllWindows()
+
 
