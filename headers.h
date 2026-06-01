@@ -234,6 +234,7 @@ bool database::search(std::string name,bool& found,bank& banki){
         }else{
             banki.locked=false;
         }
+        banki.sign=reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
     }else{
             found=false;
         }sqlite3_finalize(stmt);
@@ -346,13 +347,13 @@ class uinter{
         database& db;
         int cf=1,l=0,rdu,current_frame=0,frame_delay=75,manag=-1,focus=-1,res,nx,ny,wy=740,no=0,state=-1,bmode=-1;//using bmode to manage the board mode , 0 for search ,1 for delete and 2 for news 
         Uint32 ct,gt,lgt=0,rt,current_time,lframe_time=0,timer,ltimer=0,lt=0;
-        SDL_Texture *loss,*profit,*mbank,*cuts,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
+        SDL_Texture *check,*loss,*profit,*mbank,*cuts,*bbank,*cbank,*ar,*nbutton,*cat,*jew,*somal,*adolf,*kirk,*star,*map11,*map12,*map13,*map21,*map22,*map23,*map31,*map32,*map33,*ab,*sbu,*dbu,*lb,*nb,*wind,*load;
         int vit=0,j,worldx=-1280,worldy=-720,vx=0,vy=0,dragsx,dragsy,lsx,lsy;
         std::string tempn2,name,inter,s1="",s2="",s3="",s4="",mes="",sign="",sig="";
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb,clicked_bank;
-        bool cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
+        bool checkd=false,cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
         std::vector<bank> bankvec;
         std::vector<SDL_Texture*> adolfcs,kirkcs,jewcs,somalcs;
     public:
@@ -685,6 +686,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
 
     SDL_Surface* prs=IMG_Load("assets/ui/profit.png");
     SDL_Surface* lss=IMG_Load("assets/ui/loss.png");
+    SDL_Surface* checks=IMG_Load("assets/ui/check.png");
 
 
 
@@ -774,7 +776,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     scan=SDL_CreateTextureFromSurface(renderer,scans);
     lock_his_ass_up=SDL_CreateTextureFromSurface(renderer,lockups);    
     dbb=SDL_CreateTextureFromSurface(renderer,dbbs);
-
+    check=SDL_CreateTextureFromSurface(renderer,checks);
     mbank_gr=SDL_CreateTextureFromSurface(renderer,mbgs);
     cbank_gr=SDL_CreateTextureFromSurface(renderer,cbgs);
     bbank_gr=SDL_CreateTextureFromSurface(renderer,bbgs);
@@ -830,6 +832,7 @@ uinter::uinter(SDLinit& sdlo,database& dbo):sdl(sdlo),db(dbo){
     SDL_FreeSurface(mbrs);
     SDL_FreeSurface(cbrs);
     SDL_FreeSurface(bbrs);
+    SDL_FreeSurface(checks);
 
     
 
@@ -1062,11 +1065,13 @@ void uinter::layout(int* mode){
                         sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
                         sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
                         if(!mes.empty()){sdl.drawtext(400,580,mes);}
-                        if(cd){
+                        if(checkd){
                             draw(dbb,1000,300,250,250);
                             //SDL_Rect test={1060,385,130,60};
                             //SDL_SetRenderDrawColor(renderer,0,0,0,255);
                             //SDL_RenderFillRect(renderer,&test);
+                        }else{
+                            draw(check,1000,300,250,250);
                         }
                         
                         std::string tempn;
@@ -1113,6 +1118,31 @@ void uinter::layout(int* mode){
                          }else{
                             sdl.drawtext(100,350,"not found twin");
                          }
+                         if(rd==false){
+                            recognition();
+                            rd=true;
+                         }
+                        std::string sig="";
+                        std::ifstream fike("state.txt");
+                        std::string line;
+                        std::getline(fike,line);
+                        sig=line[0];
+                        if (sig=="0"){
+                            sign="hand closed";
+                        }else if(sig=="1"){
+                            sign="hand open";
+                        }else if (sig=="2"){
+                            sign="peace";
+                        }else if(sig==""){
+                            sign="unknown";
+                        }
+                        if (sign==newbb.sign){
+                            checkd=true;
+                        }else{
+                            checkd=false;
+                        }
+                        sdl.drawtext(500,300,"your sign is : "+sign);
+                        sdl.drawtext(500,400,"bankf sign is : "+newbb.sign);
                          if(cip){
                             cutscene(newbb.manager); 
                             if(cf >= 141){ 
@@ -1120,6 +1150,8 @@ void uinter::layout(int* mode){
                                 cf = 0;
                         }
                     }
+                    
+                    
 
 
 
@@ -1188,13 +1220,7 @@ void uinter::layout(int* mode){
                          }else{
                             sdl.drawtext(100,350,"not found twin");
                          }
-                         if(cip){
-                            cutscene(newbb.manager); 
-                            if(cf >= 141){ 
-                                cip = false;
-                                cf = 0;
-                        }
-                    }
+                         
 
 
 
@@ -1589,7 +1615,10 @@ void uinter::handle(SDL_Event& event,int &mode){
                             focus=1;
 
                         }
-                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd){
+                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && !checkd){
+                            rd=false;
+                        
+                        }if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && checkd){
                             if(db.remove(s1)){
                                 
                                 cf=0;
