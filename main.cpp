@@ -16,7 +16,6 @@ int main(void){
         uic.layout(&mode);
 
         sdl.present();
-        std::cout<<"your mode is "<<uic.bmodes();
 
         }
         sdl.~SDLinit();

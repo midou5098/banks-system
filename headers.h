@@ -82,7 +82,6 @@ std::vector<bank> database::loadbanks(void){
         b.sign = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
         
         bankvec.push_back(b);
-        std::cout<<b.x;
     }
     return bankvec;
     
@@ -235,7 +234,6 @@ bool database::search(std::string name,bool& found,bank& banki){
         }else{
             banki.locked=false;
         }
-        banki.sign=reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
     }else{
             found=false;
         }sqlite3_finalize(stmt);
@@ -354,7 +352,7 @@ class uinter{
         SDL_Texture* mapst[9],*scan,*temptex,*managfra,*lock_his_ass_up,*dbb,*mbank_gr,*cbank_gr,*bbank_gr,*mbank_re,*cbank_re,*bbank_re;
         SDL_Rect rect[9],windr;
         bank newb,newbb,srb,clicked_bank;
-        bool rdfd=false,cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
+        bool cip=false,isdrg=false,cd=false,fs=false,popped=false,down=false,up=true,onboard=false,found=true,rd=false;
         std::vector<bank> bankvec;
         std::vector<SDL_Texture*> adolfcs,kirkcs,jewcs,somalcs;
     public:
@@ -371,7 +369,6 @@ class uinter{
         void updatebanks(void);
         void renderbanks(void);
         void cutscene(int mang);
-        int bmode(void){return bmode;};
         
         void shuffle(void){j=rand()%5;};
         uinter(SDLinit& sdlo,database& dbo);
@@ -452,7 +449,6 @@ void uinter::renderbanks(void){
             }
             rect.x = (b.x * 3840)+worldx;
             rect.y = (b.y * 2160)+worldy;
-            std::cout<<rect.x;
             rect.w=100;
             rect.h=100;
             
@@ -494,7 +490,7 @@ void uinter::renderbanks(void){
 
 void uinter::updatebanks(void){
     if(bankvec.empty()) return;
-    if(SDL_GetTicks() - gt > 1500){
+    if(SDL_GetTicks() - gt > 500){
         gt = SDL_GetTicks();
         rdu = rand() % 2;
         l = rand() % bankvec.size(); 
@@ -1192,45 +1188,6 @@ void uinter::layout(int* mode){
                          }else{
                             sdl.drawtext(100,350,"not found twin");
                          }
-                         
-                         if(rdfd){
-                            if(rd==false){
-                                recognition();
-                                rd=true;
-                                rdfd=false;
-                            }
-                         }else{
-                            std::string sig="";
-                            std::ifstream fike("state.txt");
-                            std::string line;
-                            std::getline(fike,line);
-                            sig=line[0];
-                            if (sig=="0"){
-                                sign="hand closed";
-                            }else if(sig=="1"){
-                                sign="hand open";
-                            }else if (sig=="2"){
-                                sign="peace";
-                            }else if(sig==""){
-                                sign="unknown";
-                            }
-                            if(newbb.sign==sign){
-                                if(db.remove(s1)){
-                                
-                                cf=0;
-                                ct=0;
-                                mes="done nuked the whole bank";
-                                cip=true;
-                                bankvec=db.loadbanks();
-                                rd=false;
-                                rdfd=false;
-
-                            }else{
-                                mes="error type shi";
-                                rdfd=false;
-                            }
-                            }
-                         }
                          if(cip){
                             cutscene(newbb.manager); 
                             if(cf >= 141){ 
@@ -1607,7 +1564,6 @@ void uinter::handle(SDL_Event& event,int &mode){
 
                     }else{
                         if(checkms(msx,msy,(b.x * 3840)+worldx,(b.y * 2160)+worldy,100,100)){
-                            std::cout<<"clicked bank"<<b.name;
                             lt=SDL_GetTicks();
                                 if (state==-1){
                                     bmode=4;
@@ -1633,10 +1589,18 @@ void uinter::handle(SDL_Event& event,int &mode){
                             focus=1;
 
                         }
-                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
-                            rdfd=true;
-                            
-                            
+                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd){
+                            if(db.remove(s1)){
+                                
+                                cf=0;
+                                ct=0;
+                                mes="done nuked the whole bank";
+                                cip=true;
+                                bankvec=db.loadbanks();
+
+                            }else{
+                                mes="error type shi";
+                            }
                         
                         }
 
@@ -1690,7 +1654,6 @@ void uinter::handle(SDL_Event& event,int &mode){
                     if (checkms(msx,msy,160,90,1120,630)){
                         newb.x=((msx-160.0)/1120.0);
                         newb.y=((msy-90.0)/540.0);
-                        std::cout<<newb.x;
                         mode=13;
                     }
 
