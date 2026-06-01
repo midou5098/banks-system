@@ -144,7 +144,8 @@ bool database::remove(std::string s){
     sql="DELETE FROM banks WHERE name=?";
     sqlite3_prepare_v2(db,sql,-1,&stmt,nullptr);
     sqlite3_bind_text(stmt,1,s.c_str(),-1,SQLITE_STATIC);
-    if(sqlite3_step(stmt)==SQLITE_DONE){
+    int res=sqlite3_step(stmt);
+    if(res!=0){
         sqlite3_finalize(stmt);
         return true;
 
@@ -1065,13 +1066,17 @@ void uinter::layout(int* mode){
                         sdl.drawtext(100,450,"clients : "+std::to_string(newbb.clients));
                         sdl.drawtext(100,500,"funds : "+std::to_string(newbb.funds));
                         if(!mes.empty()){sdl.drawtext(400,580,mes);}
-                        if(checkd){
+                        if(newbb.locked==true){
+                            if(checkd ){
                             draw(dbb,1000,300,250,250);
                             //SDL_Rect test={1060,385,130,60};
                             //SDL_SetRenderDrawColor(renderer,0,0,0,255);
                             //SDL_RenderFillRect(renderer,&test);
+                            }else{
+                                draw(check,1000,300,250,250);
+                            }
                         }else{
-                            draw(check,1000,300,250,250);
+                            draw(dbb,1000,300,250,250);
                         }
                         
                         std::string tempn;
@@ -1122,6 +1127,8 @@ void uinter::layout(int* mode){
                             recognition();
                             rd=true;
                          }
+                        
+
                         std::string sig="";
                         std::ifstream fike("state.txt");
                         std::string line;
@@ -1136,11 +1143,13 @@ void uinter::layout(int* mode){
                         }else if(sig==""){
                             sign="unknown";
                         }
+                        std::cout<<sign;
                         if (sign==newbb.sign){
                             checkd=true;
                         }else{
                             checkd=false;
                         }
+                        
                         sdl.drawtext(500,300,"your sign is : "+sign);
                         sdl.drawtext(500,400,"bankf sign is : "+newbb.sign);
                          if(cip){
@@ -1432,6 +1441,7 @@ void uinter::handle(SDL_Event& event,int &mode){
             case 22:
                 if(key==SDLK_ESCAPE){
                     mode=-1;
+                    sign="";
                 }
                 if(focus==0){
                     if(key==SDLK_BACKSPACE && !s1.empty()){
@@ -1615,22 +1625,39 @@ void uinter::handle(SDL_Event& event,int &mode){
                             focus=1;
 
                         }
-                        if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && !checkd){
-                            rd=false;
+                        if (newbb.locked==true){
+                            if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && !checkd){
+                                rd=false;
                         
-                        }if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && checkd){
-                            if(db.remove(s1)){
-                                
-                                cf=0;
-                                ct=0;
-                                mes="done nuked the whole bank";
-                                cip=true;
-                                bankvec=db.loadbanks();
+                            }if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty() && cd && checkd){
+                                if(db.remove(s1)){
+                                    
+                                    cf=0;
+                                    ct=0;
+                                    mes="done nuked the whole bank";
+                                    cip=true;
+                                    bankvec=db.loadbanks();
 
-                            }else{
-                                mes="error type shi";
+                                }else{
+                                    mes="error type shi";
+                                }
+                            
                             }
-                        
+                        }else{
+                            if(checkms(msx,msy,1060,385,130,60) && found==true && !s1.empty()){
+                                if(db.remove(s1)){
+                                    
+                                    cf=0;
+                                    ct=0;
+                                    mes="done nuked the whole bank";
+                                    cip=true;
+                                    bankvec=db.loadbanks();
+
+                                }else{
+                                    mes="error type shi";
+                                }
+                            
+                            }
                         }
 
                     }

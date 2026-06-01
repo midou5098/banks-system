@@ -64,7 +64,7 @@ while True:
                         last_state = pito
                         last_write_time = current_time
                 mp.solutions.drawing_utils.draw_landmarks(frame,hands_landmark,mp_hnds.HAND_CONNECTIONS)
-    print(f"dis nigga hands are ? {pito}")
+ 
     
     cv2.imshow("webcame",frame)
 with open("state.txt", "w") as file:
